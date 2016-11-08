@@ -1,0 +1,7 @@
+/DomovoyParser.suo
+/DomovoyParser/*.txt
+/DomovoyParser/obj
+/DomovoyParser/bin/Debug/*.dat
+/DomovoyParser/bin/Debug/RDS/Dumps
+/DomovoyParser/bin/Debug/RDS/Dumps/*.dat
+/DomovoyParser/bin/Debug/RDS/Dumps/*.txt

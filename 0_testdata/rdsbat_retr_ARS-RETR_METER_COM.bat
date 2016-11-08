@@ -1,0 +1,1 @@
+rdslib.exe  "-ptype=serial,port=COM11" -o"127.0.0.1:C:\Users\ikhromov\Desktop\RDS\4rmd.gdb" -f"1_retr-meter_tcp_dump.dat" -s0 -c30 -n10 -m00FD450800F00935 -r0935 -D100 -aF00935 -M2  2>1_retr-meter_com_log.txt  

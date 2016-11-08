@@ -1,0 +1,1 @@
+rdslib.exe  "-ptype=serial,port=COM11" -o"127.0.0.1:C:\Users\ikhromov\Desktop\RDS\4rmd.gdb" -f"ars-meter_com_dump.dat" -s0 -c30 -n10 -r0935 -D100 -aF00935 -M2  2>ars-meter_com_log.txt  
