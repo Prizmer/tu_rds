@@ -22,14 +22,7 @@ namespace DomovoyParser
         {
             InitializeComponent();
 
-            if (openedFilename.Length > 0)
-            {
-                if (loadDumpFile(openedFilename))
-                    PrintLastRecord((int)numericUpDown1.Value);
-            }
-
             InitFreeMode();
-
             richTextBox1.Text = "Двойной клик для выбора *.dat файла или группы *.bat файлов";
 
             openFileDialog = new OpenFileDialog();
@@ -48,6 +41,12 @@ namespace DomovoyParser
             BatchConnection.FolderNameLib = "RDS";
             BatchConnection.FolderNameDump = "Dumps";
             BatchConnection.FolderNameLog = BatchConnection.FolderNameDump;
+
+            if (openedFilename.Length > 0)
+            {
+                if (loadDumpFile(openedFilename))
+                    PrintLastRecord((int)numericUpDown1.Value);
+            }
         }
 
         const string DIR_NAME_LIB = "RDS";
