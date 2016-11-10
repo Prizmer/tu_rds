@@ -159,6 +159,7 @@ namespace DomovoyParser
             if (fStreamDump != null)
             {
                 if (bClearBefore) richTextBox1.Clear();
+
                 int lastFileByteIndex = (int)(fStreamDump.Length);
                 long lastRecordFirstIndex = lastFileByteIndex - bytesFromTheEnd - RecordLength;
                 fStreamDump.Seek((int)lastRecordFirstIndex, SeekOrigin.Begin);
@@ -298,13 +299,17 @@ namespace DomovoyParser
 
 
         MeterInfo tmpMeterInfo = new MeterInfo();
-        private bool loadDumpFile(string filename)
+        private bool loadDumpFile(string filename, bool doDumpMode = true)
         {
             fStreamDump = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+
             if (GetMeterInfo(fStreamDump, ref tmpMeterInfo))
             {
-                PrintLastRecord((int)numericUpDown1.Value);
-                InitDumpReaderMode(filename);
+                if (doDumpMode)
+                {
+                    PrintLastRecord((int)numericUpDown1.Value);
+                    InitDumpReaderMode(filename);
+                }
                 return true;
             }
             else
@@ -384,7 +389,7 @@ namespace DomovoyParser
 
                 if (File.Exists(bConn.FileNameDump))
                 {
-                    if (loadDumpFile(bConn.FileNameDump))
+                    if (loadDumpFile(bConn.FileNameDump, false))
                     {
                         this.Invoke((MethodInvoker)delegate()
                         {
