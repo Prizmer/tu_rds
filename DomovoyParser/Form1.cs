@@ -385,7 +385,23 @@ namespace DomovoyParser
                 Process procCommand = Process.Start(psiOpt);
                procCommand.StandardInput.WriteLine(tmpCmd);
 
-               Thread.Sleep((int)numResponseTimeout.Value * 1000);
+               this.Invoke((MethodInvoker)delegate()
+               {
+                   timerProgressBar.Maximum = (int)numResponseTimeout.Value;
+                   timerProgressBar.Value = 0;
+               });
+
+               for (int t = 0; t < (int)numResponseTimeout.Value; t++)
+               {
+                   if (StopFlag) return;
+                   Thread.Sleep(1000);
+
+                   this.Invoke((MethodInvoker)delegate()
+                   {
+                       ++timerProgressBar.Value;
+                   });
+
+               }
 
                 if (File.Exists(bConn.FileNameDump))
                 {
@@ -394,6 +410,7 @@ namespace DomovoyParser
                         this.Invoke((MethodInvoker)delegate()
                         {
                             PrintLastRecord((int)numericUpDown1.Value, false);
+                            PrintMsg("\n");
                         });
                     }
 
