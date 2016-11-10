@@ -727,7 +727,7 @@ namespace DomovoyParser
             List<BatchConnection> tmpBatchConnList = new List<BatchConnection>();
             tmpBatchConnList.Add(tmpBatchConn);
 
-            ExecuteBatchConnectionList(tmpBatchConnList);
+            StartExecutingThread(tmpBatchConnList);
         }
 
         private void btnExecAll_Click(object sender, EventArgs e)
@@ -1042,7 +1042,9 @@ namespace DomovoyParser
             if (FolderNameLog.Length == 0) FolderNameLog = FolderNameDump;
             string logsFolder = baseDirectory + FolderNameLib + "\\" + FolderNameLog;
             Directory.CreateDirectory(logsFolder);
-            FileNameLog = logsFolder + "\\" + this.GenerateFileName(".log");     
+            FileNameLog = logsFolder + "\\" + this.GenerateFileName(".log");
+
+            this._batchContentString = Regex.Match(_batchContentString, ".*log\"?").Groups[0].Value;
         }
     }
 }
