@@ -45,13 +45,13 @@
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsLblTotalFiles = new System.Windows.Forms.ToolStripStatusLabel();
             this.grBoxBat = new System.Windows.Forms.GroupBox();
-            this.stopBtn = new System.Windows.Forms.Button();
             this.btnExecAll = new System.Windows.Forms.Button();
             this.btnShowFile = new System.Windows.Forms.Button();
             this.numBatchFileNum = new System.Windows.Forms.NumericUpDown();
             this.btnExecFile = new System.Windows.Forms.Button();
             this.btnListOpenedFiles = new System.Windows.Forms.Button();
             this.geBoxComm = new System.Windows.Forms.GroupBox();
+            this.stopBtn = new System.Windows.Forms.Button();
             this.timerProgressBar = new System.Windows.Forms.ProgressBar();
             this.label1 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
@@ -200,7 +200,6 @@
             // 
             // grBoxBat
             // 
-            this.grBoxBat.Controls.Add(this.stopBtn);
             this.grBoxBat.Controls.Add(this.btnExecAll);
             this.grBoxBat.Controls.Add(this.btnShowFile);
             this.grBoxBat.Controls.Add(this.numBatchFileNum);
@@ -213,23 +212,12 @@
             this.grBoxBat.TabStop = false;
             this.grBoxBat.Text = "Работа с *.bat файлами";
             // 
-            // stopBtn
-            // 
-            this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.stopBtn.Location = new System.Drawing.Point(119, 99);
-            this.stopBtn.Name = "stopBtn";
-            this.stopBtn.Size = new System.Drawing.Size(55, 23);
-            this.stopBtn.TabIndex = 6;
-            this.stopBtn.Text = "Стоп";
-            this.stopBtn.UseVisualStyleBackColor = true;
-            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
-            // 
             // btnExecAll
             // 
             this.btnExecAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExecAll.Location = new System.Drawing.Point(6, 99);
             this.btnExecAll.Name = "btnExecAll";
-            this.btnExecAll.Size = new System.Drawing.Size(107, 23);
+            this.btnExecAll.Size = new System.Drawing.Size(176, 23);
             this.btnExecAll.TabIndex = 5;
             this.btnExecAll.Text = "Выполнить все";
             this.btnExecAll.UseVisualStyleBackColor = true;
@@ -284,7 +272,7 @@
             this.btnListOpenedFiles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnListOpenedFiles.Location = new System.Drawing.Point(6, 19);
             this.btnListOpenedFiles.Name = "btnListOpenedFiles";
-            this.btnListOpenedFiles.Size = new System.Drawing.Size(168, 23);
+            this.btnListOpenedFiles.Size = new System.Drawing.Size(176, 23);
             this.btnListOpenedFiles.TabIndex = 0;
             this.btnListOpenedFiles.Text = "Список файлов";
             this.btnListOpenedFiles.UseVisualStyleBackColor = true;
@@ -292,6 +280,7 @@
             // 
             // geBoxComm
             // 
+            this.geBoxComm.Controls.Add(this.stopBtn);
             this.geBoxComm.Controls.Add(this.timerProgressBar);
             this.geBoxComm.Controls.Add(this.label1);
             this.geBoxComm.Controls.Add(this.numericUpDown1);
@@ -303,6 +292,17 @@
             this.geBoxComm.TabIndex = 13;
             this.geBoxComm.TabStop = false;
             this.geBoxComm.Text = "Общее";
+            // 
+            // stopBtn
+            // 
+            this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.stopBtn.Location = new System.Drawing.Point(152, 99);
+            this.stopBtn.Name = "stopBtn";
+            this.stopBtn.Size = new System.Drawing.Size(60, 23);
+            this.stopBtn.TabIndex = 17;
+            this.stopBtn.Text = "Стоп";
+            this.stopBtn.UseVisualStyleBackColor = true;
+            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
             // 
             // timerProgressBar
             // 
@@ -364,6 +364,7 @@
             0,
             0,
             0});
+            this.numResponseTimeout.ValueChanged += new System.EventHandler(this.numResponseTimeout_ValueChanged);
             // 
             // label2
             // 

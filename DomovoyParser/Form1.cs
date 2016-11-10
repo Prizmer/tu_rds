@@ -37,6 +37,7 @@ namespace DomovoyParser
             BatchConnectionList = new List<BatchConnection>();
 
             this.Text = formCaptionStringBase;
+            stopBtn.Enabled = false;
 
             BatchConnection.FolderNameLib = "RDS";
             BatchConnection.FolderNameDump = "Dumps";
@@ -338,7 +339,6 @@ namespace DomovoyParser
             BatchFileTriedEvent = new EventHandler<EventArgs>(BatchFileTried_EventHandler);
             BatchFileExecutionEndEvent = new EventHandler<EventArgs>(BatchFileExecutionEnd_EventHandler);
 
-
             ExecutingThread = new Thread(new ParameterizedThreadStart(ExecuteBatchConnectionList));
             ExecutingThread.Start(batchConnectionList);
         }
@@ -352,7 +352,6 @@ namespace DomovoyParser
                 return;
 
             BatchFileExecutionStartEvent.Invoke(null, new EventArgs());
-            ClearScreen();
 
             for (int i = 0; i < batchConnectionList.Count; i++)
             {
@@ -368,7 +367,8 @@ namespace DomovoyParser
                 if (!bConn.ExistsRDS)
                 {
                     PrintMsg(String.Format("{1}: файл 'rdslib.exe, необходимый для подключения, не найден. Дирректория поиска: {0}\n\n", bConn.FileNameRDSLib, bConn.SerialNumber));
-                    continue;
+                    BatchFileExecutionEnd_EventHandler(null, new EventArgs());
+                    return;
                 }
 
                 // создаем процесс cmd.exe с параметрами "ipconfig /all"
@@ -393,7 +393,12 @@ namespace DomovoyParser
 
                for (int t = 0; t < (int)numResponseTimeout.Value; t++)
                {
-                   if (StopFlag) return;
+                   if (StopFlag)
+                   {
+                       BatchFileExecutionEnd_EventHandler(null, new EventArgs());
+                       return;
+                   } 
+
                    Thread.Sleep(1000);
 
                    this.Invoke((MethodInvoker)delegate()
@@ -438,35 +443,19 @@ namespace DomovoyParser
 
         public void BatchFileExecutionStart_EventHandler(object sender, EventArgs e)
         {
-            timeoutProgressBarTimer = new System.Windows.Forms.Timer();
-            timeoutProgressBarTimer.Interval = 1000;
-            timeoutProgressBarTimer.Tick += new EventHandler(TimoutTimerTick_EventHandler);
-
             Delegate del = (MethodInvoker)delegate()
             {
-                toolStripProgressBar1.Value = 0;
-                tsLblCurrentFile.Text = "0";
+                ClearScreen();
+                ResetGUIParams();
+
                 this.Text = formCaptionStringBase + formCaptionMultiBatchMode + formCaptionBatExecution;
-
-                if (clearStatusTimer != null)
-                    clearStatusTimer.Stop();
-
-                timerProgressBar.Minimum = 0;
-                timerProgressBar.Maximum = (int)numResponseTimeout.Value;
-                timerProgressBar.Value = 0;
-
+                grBoxBat.Enabled = false;
+                grBoxDump.Enabled = false;
+                stopBtn.Enabled = true;
                 fileCnt = 1;
-
             };
 
             this.Invoke(del);
-        }
-
-
-        int ticksCnt = 0;
-        public void TimoutTimerTick_EventHandler(object sender, EventArgs e)
-        {
-
         }
 
         int fileCnt = 1;
@@ -481,24 +470,28 @@ namespace DomovoyParser
             this.Invoke(del);
         }
 
-        System.Windows.Forms.Timer clearStatusTimer;
-        System.Windows.Forms.Timer timeoutProgressBarTimer;
-
         public void BatchFileExecutionEnd_EventHandler(object sender, EventArgs e)
         {
 
             Delegate del = (MethodInvoker)delegate()
             {
-                grBoxBat.Enabled = true;
-                this.Text = formCaptionStringBase + formCaptionMultiBatchMode;
+                ResetGUIParams();
 
-                //tsLblCurrentFile.Text = "0";
-                //toolStripProgressBar1.Value = 0;
+                this.Text = formCaptionStringBase + formCaptionMultiBatchMode;
+                grBoxBat.Enabled = true;
+                stopBtn.Enabled = false;
+
+                string buf = richTextBox1.Text;
+                richTextBox1.Clear();
+                richTextBox1.Text += "*** ОПРОС ЗАВЕРШЕН ***\n\n";
+                richTextBox1.Text += buf;
 
             };
 
             Invoke(del);
         }
+
+
 
         #endregion
 
@@ -535,6 +528,26 @@ namespace DomovoyParser
 
 
         #region Инициализаторы режимов
+
+        private void ResetGUIParams()
+        {
+            tsLblCurrentFile.Text = "0";
+
+            int batchFilesCount = 0;
+            if (BatchConnectionList != null && BatchConnectionList.Count > 0)
+                batchFilesCount = BatchConnectionList.Count;
+            else
+                batchFilesCount = 0;
+
+            tsLblTotalFiles.Text = batchFilesCount.ToString();
+            toolStripProgressBar1.Maximum = batchFilesCount;
+            toolStripProgressBar1.Value = 0;
+
+            timerProgressBar.Value = 0;
+            timerProgressBar.Maximum = (int)numResponseTimeout.Value;
+
+            stopBtn.Enabled = false;
+        }
 
         private void InitFreeMode()
         {
@@ -771,15 +784,22 @@ namespace DomovoyParser
 
         private void stopBtn_Click(object sender, EventArgs e)
         {
-            StopFlag = true;
-            richTextBox1.Text += "Опрос остановится через несколько секунд\n";
+            if (ExecutingThread != null && ExecutingThread.IsAlive)
+            {
+                StopFlag = true;
+                richTextBox1.Text += "\nОпрос остановится через несколько секунд\n";
+            }
+        }
+
+        private void numResponseTimeout_ValueChanged(object sender, EventArgs e)
+        {
+            int val = (int)((NumericUpDown)sender).Value;
+
+            timerProgressBar.Value = 0;
+            timerProgressBar.Maximum = val;
         }
         
         #endregion
-
-
-
-
     }
 
     public class BatchConnection
