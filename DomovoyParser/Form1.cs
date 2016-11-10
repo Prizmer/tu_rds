@@ -32,7 +32,7 @@ namespace DomovoyParser
             folderBrowserDialog.SelectedPath = AppDomain.CurrentDomain.BaseDirectory;
             folderBrowserDialog.Description = "Выберите дирректорию, содержащую файлы *.bat";
 
-            numResponseTimeout.Value = 15;
+            numResponseTimeout.Value = 8;
 
             BatchConnectionList = new List<BatchConnection>();
 
@@ -236,6 +236,9 @@ namespace DomovoyParser
                     richTextBox1.Text += String.Format("Battery{0}: {1}{2}; ", "", p.VoltsBattery, " Volts");
                     richTextBox1.Text += String.Format("Reserved{0}: {1}{2}; ", "", p.Reserved, "");
                 }
+
+                if (!bClearBefore)
+                    richTextBox1.Text += "\n";
             }
         }
 
@@ -385,7 +388,7 @@ namespace DomovoyParser
                     {
                         this.Invoke((MethodInvoker)delegate()
                         {
-                            PrintLastRecord((int)numericUpDown1.Value);
+                            PrintLastRecord((int)numericUpDown1.Value, false);
                         });
                     }
 
@@ -464,9 +467,12 @@ namespace DomovoyParser
 
             Delegate del = (MethodInvoker)delegate()
             {
+                grBoxBat.Enabled = true;
                 this.Text = formCaptionStringBase + formCaptionMultiBatchMode;
-                tsLblCurrentFile.Text = "0";
-                toolStripProgressBar1.Value = 0;
+
+                //tsLblCurrentFile.Text = "0";
+                //toolStripProgressBar1.Value = 0;
+
             };
 
             Invoke(del);

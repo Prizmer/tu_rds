@@ -45,6 +45,7 @@
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsLblTotalFiles = new System.Windows.Forms.ToolStripStatusLabel();
             this.grBoxBat = new System.Windows.Forms.GroupBox();
+            this.stopBtn = new System.Windows.Forms.Button();
             this.btnExecAll = new System.Windows.Forms.Button();
             this.btnShowFile = new System.Windows.Forms.Button();
             this.numBatchFileNum = new System.Windows.Forms.NumericUpDown();
@@ -56,7 +57,6 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.numResponseTimeout = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
-            this.stopBtn = new System.Windows.Forms.Button();
             this.grBoxDump.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -213,6 +213,17 @@
             this.grBoxBat.TabStop = false;
             this.grBoxBat.Text = "Работа с *.bat файлами";
             // 
+            // stopBtn
+            // 
+            this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.stopBtn.Location = new System.Drawing.Point(119, 99);
+            this.stopBtn.Name = "stopBtn";
+            this.stopBtn.Size = new System.Drawing.Size(55, 23);
+            this.stopBtn.TabIndex = 6;
+            this.stopBtn.Text = "Стоп";
+            this.stopBtn.UseVisualStyleBackColor = true;
+            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
+            // 
             // btnExecAll
             // 
             this.btnExecAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -349,7 +360,7 @@
             this.numResponseTimeout.Size = new System.Drawing.Size(60, 20);
             this.numResponseTimeout.TabIndex = 13;
             this.numResponseTimeout.Value = new decimal(new int[] {
-            10,
+            8,
             0,
             0,
             0});
@@ -362,17 +373,6 @@
             this.label2.Size = new System.Drawing.Size(129, 13);
             this.label2.TabIndex = 12;
             this.label2.Text = "Ожидание ответа (сек.):";
-            // 
-            // stopBtn
-            // 
-            this.stopBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.stopBtn.Location = new System.Drawing.Point(119, 99);
-            this.stopBtn.Name = "stopBtn";
-            this.stopBtn.Size = new System.Drawing.Size(55, 23);
-            this.stopBtn.TabIndex = 6;
-            this.stopBtn.Text = "Стоп";
-            this.stopBtn.UseVisualStyleBackColor = true;
-            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
             // 
             // Form1
             // 
