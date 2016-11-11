@@ -513,15 +513,7 @@ namespace Prizmer.Meters
 
                     if (ts.TotalDays < readDailyTimeoutInDays)
                     {
-                        bool DELETE_DUMPS_AFTER_PARSING = false;
-                        if (!ParseDumpFile(latestDumpFileName, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
-                            return false;
-
-                        if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
-                            return false;
-
-                        return true;
-                        //return false;
+                        return false;
                     }
                     else
                     {
@@ -552,12 +544,12 @@ namespace Prizmer.Meters
             if (!ExecuteBatchConnection(batchConnList[0]))
                 return false;
 
-            //bool DELETE_DUMPS_AFTER_PARSING = false;
-            //if (!ParseDumpFile(batchConnList[0].FileNameDump, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
-            //    return false;
+            bool DELETE_DUMPS_AFTER_PARSING = false;
+            if (!ParseDumpFile(batchConnList[0].FileNameDump, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
+                return false;
 
-            //if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
-            //    return false;
+            if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
+                return false;
 
             return true;
         }
