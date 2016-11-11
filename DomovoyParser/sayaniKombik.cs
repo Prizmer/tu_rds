@@ -319,10 +319,9 @@ namespace Prizmer.Meters
                     tmpRes = true;
 
             dumpFileStream.Close();
-            if (deleteAfterParse)
-            {
-                File.Delete(fileName);
-            }
+
+            if (tmpRes && deleteAfterParse)
+                DeleteDumpFileAndLogs(fileName);
 
             return tmpRes;
         }
@@ -414,6 +413,28 @@ namespace Prizmer.Meters
         }
 
 
+        private bool DeleteDumpFileAndLogs(string dumpFileName)
+        {
+
+            File.Delete(dumpFileName);
+
+            try
+            {
+                //разберемся с файлом лога
+                string logDir = Path.GetDirectoryName(dumpFileName);
+                string logFName = Path.GetFileNameWithoutExtension(dumpFileName);
+                string logFullFileName = logDir + "\\" + logFName + ".log";
+
+                if (File.Exists(logFullFileName))
+                    File.Delete(logFullFileName);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         #region Методы интерфейса
 
@@ -493,7 +514,7 @@ namespace Prizmer.Meters
                     }
                     else
                     {
-                        File.Delete(latestDumpFileName);
+                        DeleteDumpFileAndLogs(latestDumpFileName);
                     }
                 }
             }
