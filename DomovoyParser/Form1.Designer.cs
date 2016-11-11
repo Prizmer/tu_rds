@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.grBoxDump = new System.Windows.Forms.GroupBox();
@@ -57,6 +58,14 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.numResponseTimeout = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnReadDaily = new System.Windows.Forms.Button();
+            this.btnReadCurrent = new System.Windows.Forms.Button();
+            this.tbPass = new System.Windows.Forms.TextBox();
+            this.tbSerial = new System.Windows.Forms.TextBox();
+            this.numT = new System.Windows.Forms.NumericUpDown();
+            this.numP = new System.Windows.Forms.NumericUpDown();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.grBoxDump.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -65,6 +74,9 @@
             this.geBoxComm.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numResponseTimeout)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numT)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numP)).BeginInit();
             this.SuspendLayout();
             // 
             // richTextBox1
@@ -76,7 +88,7 @@
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
             this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.richTextBox1.Size = new System.Drawing.Size(664, 205);
+            this.richTextBox1.Size = new System.Drawing.Size(660, 205);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             this.richTextBox1.DoubleClick += new System.EventHandler(this.richTextBox1_DoubleClick);
@@ -86,7 +98,7 @@
             this.grBoxDump.Controls.Add(this.button2);
             this.grBoxDump.Location = new System.Drawing.Point(206, 249);
             this.grBoxDump.Name = "grBoxDump";
-            this.grBoxDump.Size = new System.Drawing.Size(241, 132);
+            this.grBoxDump.Size = new System.Drawing.Size(111, 132);
             this.grBoxDump.TabIndex = 6;
             this.grBoxDump.TabStop = false;
             this.grBoxDump.Text = "Работа с дампом";
@@ -114,7 +126,7 @@
             this.menuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(685, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(684, 24);
             this.menuStrip1.TabIndex = 8;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -171,7 +183,7 @@
             this.tsLblTotalFiles});
             this.statusStrip1.Location = new System.Drawing.Point(0, 390);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(685, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(684, 22);
             this.statusStrip1.TabIndex = 9;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -286,7 +298,7 @@
             this.geBoxComm.Controls.Add(this.numericUpDown1);
             this.geBoxComm.Controls.Add(this.numResponseTimeout);
             this.geBoxComm.Controls.Add(this.label2);
-            this.geBoxComm.Location = new System.Drawing.Point(453, 249);
+            this.geBoxComm.Location = new System.Drawing.Point(323, 249);
             this.geBoxComm.Name = "geBoxComm";
             this.geBoxComm.Size = new System.Drawing.Size(223, 132);
             this.geBoxComm.TabIndex = 13;
@@ -375,11 +387,106 @@
             this.label2.TabIndex = 12;
             this.label2.Text = "Ожидание ответа (сек.):";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.btnReadDaily);
+            this.groupBox1.Controls.Add(this.btnReadCurrent);
+            this.groupBox1.Controls.Add(this.tbPass);
+            this.groupBox1.Controls.Add(this.tbSerial);
+            this.groupBox1.Controls.Add(this.numT);
+            this.groupBox1.Controls.Add(this.numP);
+            this.groupBox1.Location = new System.Drawing.Point(552, 249);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(120, 132);
+            this.groupBox1.TabIndex = 14;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Ф-ии СО";
+            // 
+            // btnReadDaily
+            // 
+            this.btnReadDaily.Location = new System.Drawing.Point(60, 95);
+            this.btnReadDaily.Name = "btnReadDaily";
+            this.btnReadDaily.Size = new System.Drawing.Size(46, 23);
+            this.btnReadDaily.TabIndex = 19;
+            this.btnReadDaily.Text = "Сут";
+            this.btnReadDaily.UseVisualStyleBackColor = true;
+            this.btnReadDaily.Click += new System.EventHandler(this.btnReadDaily_Click);
+            // 
+            // btnReadCurrent
+            // 
+            this.btnReadCurrent.Location = new System.Drawing.Point(6, 95);
+            this.btnReadCurrent.Name = "btnReadCurrent";
+            this.btnReadCurrent.Size = new System.Drawing.Size(51, 23);
+            this.btnReadCurrent.TabIndex = 18;
+            this.btnReadCurrent.Text = "Тек";
+            this.btnReadCurrent.UseVisualStyleBackColor = true;
+            this.btnReadCurrent.Click += new System.EventHandler(this.btnReadCurrent_Click);
+            // 
+            // tbPass
+            // 
+            this.tbPass.Location = new System.Drawing.Point(6, 69);
+            this.tbPass.Name = "tbPass";
+            this.tbPass.Size = new System.Drawing.Size(100, 20);
+            this.tbPass.TabIndex = 17;
+            this.tbPass.Text = "3";
+            this.toolTip1.SetToolTip(this.tbPass, "Пароль: частота опоса в днях");
+            // 
+            // tbSerial
+            // 
+            this.tbSerial.Location = new System.Drawing.Point(6, 47);
+            this.tbSerial.Name = "tbSerial";
+            this.tbSerial.Size = new System.Drawing.Size(100, 20);
+            this.tbSerial.TabIndex = 16;
+            this.tbSerial.Text = "2260";
+            this.toolTip1.SetToolTip(this.tbSerial, "Последние 4 цифры десятичного серийника");
+            // 
+            // numT
+            // 
+            this.numT.Location = new System.Drawing.Point(60, 19);
+            this.numT.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.numT.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numT.Name = "numT";
+            this.numT.Size = new System.Drawing.Size(45, 20);
+            this.numT.TabIndex = 15;
+            this.toolTip1.SetToolTip(this.numT, "Канал");
+            this.numT.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // numP
+            // 
+            this.numP.Location = new System.Drawing.Point(6, 19);
+            this.numP.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numP.Name = "numP";
+            this.numP.Size = new System.Drawing.Size(51, 20);
+            this.numP.TabIndex = 14;
+            this.toolTip1.SetToolTip(this.numP, "Адрес");
+            this.numP.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(685, 412);
+            this.ClientSize = new System.Drawing.Size(684, 412);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.geBoxComm);
             this.Controls.Add(this.grBoxBat);
             this.Controls.Add(this.statusStrip1);
@@ -404,6 +511,10 @@
             this.geBoxComm.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numResponseTimeout)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numT)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numP)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -439,6 +550,14 @@
         private System.Windows.Forms.Button btnExecAll;
         private System.Windows.Forms.ProgressBar timerProgressBar;
         private System.Windows.Forms.Button stopBtn;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button btnReadDaily;
+        private System.Windows.Forms.Button btnReadCurrent;
+        private System.Windows.Forms.TextBox tbPass;
+        private System.Windows.Forms.TextBox tbSerial;
+        private System.Windows.Forms.NumericUpDown numT;
+        private System.Windows.Forms.NumericUpDown numP;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 

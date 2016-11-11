@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PollServerSrc\CMeter.cs" />
+    <Compile Include="sayaniKombik.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,6 +63,8 @@
     <Compile Include="FormConnPrms.Designer.cs">
       <DependentUpon>FormConnPrms.cs</DependentUpon>
     </Compile>
+    <Compile Include="PollServerSrc\IMeter.cs" />
+    <Compile Include="PollServerSrc\Ports.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

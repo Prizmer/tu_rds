@@ -13,6 +13,9 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
 
+using Prizmer.Meters;
+using Prizmer.Meters.iMeters;
+
 namespace DomovoyParser
 {
     public partial class Form1 : Form
@@ -60,6 +63,9 @@ namespace DomovoyParser
         string formCaptionBatExecution = " - ВЫПОЛНЕНИЕ, ЖДИТЕ";
 
         const byte RecordLength = 32;
+
+        sayani_kombik sayaniKombik = new sayani_kombik();
+        Prizmer.Ports.VirtualPort sayaniKombikVirtualPort = null;
 
         //форма генерации *.bat файла
         FormConnPrms connectionParamForm = new FormConnPrms();
@@ -800,299 +806,38 @@ namespace DomovoyParser
         }
         
         #endregion
+
+        #region Тест функционала драйвера
+
+        private void btnReadCurrent_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+
+            sayaniKombik.Init(uint.Parse(tbSerial.Text), tbPass.Text, sayaniKombikVirtualPort);
+
+            float val = -1;
+            if (sayaniKombik.ReadCurrentValues((ushort)numP.Value, (ushort)numT.Value, ref val))
+                richTextBox1.Text = "Получено значение: " + val.ToString();
+        }
+
+        private void btnReadDaily_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+
+            sayaniKombik.Init(uint.Parse(tbSerial.Text), tbPass.Text, sayaniKombikVirtualPort);
+
+            float val = -1;
+            if (sayaniKombik.ReadDailyValues(DateTime.Now.Date, (ushort)numP.Value, (ushort)numT.Value, ref val))
+                richTextBox1.Text = "Получено новое значение: " + val.ToString();
+            else
+                richTextBox1.Text = "С момента получения предыдущего значения не прошло " + tbPass.Text + " дней";
+
+        }
+
+        #endregion
+
+
+
     }
 
-    public class BatchConnection
-    {
-        public BatchConnection(string batchContent, string batchFileName = "")
-        {
-            _batchContentString = batchContent;
-            _batchContentStringOrig = batchContent;
-
-            _batchFileName = batchFileName;
-
-            UpdateWithActualData();
-        }
-
-
-
-        string _batchFileName;
-        public bool HasSourceFile
-        {
-            get 
-            {
-                if (File.Exists(_batchFileName))
-                    return true;
-                else
-                    return false;           
-            }
-        }
-
-        public string SourceFileName
-        {
-            get
-            {
-                if (HasSourceFile)
-                {
-                    return _batchFileName;
-                }
-                else
-                {
-                    return "";
-                }
-            }
-        }
-
-        public string SourceName
-        {
-            get
-            {
-                if (HasSourceFile)
-                {
-                    FileInfo fi = new FileInfo(_batchFileName);
-                    return fi.Name;
-                }
-                else
-                {
-                    return "";
-                }
-            }
-        }
-
-
-        string _batchContentStringOrig;
-        public string CommandOriginal
-        {
-            get { return _batchContentStringOrig; }
-        }
-
-        string _batchContentString;
-        public string Command
-        {
-            get
-            {
-                return _batchContentString;
-            }
-            set
-            {
-                _batchContentString = value;
-            }
-        }
-
-        public void Restore()
-        {
-            _batchContentString = _batchContentStringOrig;
-        }
-
-        public string FileNameRDSLib
-        {
-            get 
-            { 
-                if (_batchContentString.Length == 0) return "";
-                try
-                {
-                    return Regex.Match(_batchContentString, "^[^ ]*").Groups[0].Value.Replace("\"", "");
-                }
-                catch (Exception ex)
-                {
-                    return "";
-                }
-            }
-            set
-            {
-                try
-                {
-                    _batchContentString = Regex.Replace(_batchContentString, "^[^ ]*", "\"" + value + "\"");
-                }
-                catch (Exception ex)
-                {
-                    return;
-                }
-
-            }
-        }
-        public string FileNameDB
-        {
-            get 
-            { 
-                try
-                {
-                    string oOption = Regex.Match(_batchContentString, "-o\"[^ ]*").Groups[0].Value;
-                    return Regex.Match(oOption, "\\w:\\\\[^\"]*").Groups[0].Value;
-                }
-                catch (Exception ex)
-                {
-                    return "";
-                }
-            }
-            set
-            {
-                try
-                {
-                    string oOption = Regex.Match(_batchContentString, "-o\"[^ ]*").Groups[0].Value;
-                    oOption = Regex.Replace(oOption, "\\w:\\\\[^\"]*", value);
-                    _batchContentString = Regex.Replace(_batchContentString, "-o\"[^ ]*", oOption);
-                }
-                catch (Exception ex)
-                {
-                    return;
-                }
-            }
-        }        
-        public string FileNameDump
-        {
-            get 
-            { 
-                if (_batchContentString.Length == 0) return "";
-                try
-                {
-                    return Regex.Match(_batchContentString, "-f\"[^ ]*").Groups[0].Value.Replace("-f", "").Replace("\"", "");
-                }
-                catch (Exception ex)
-                {
-                    return "";
-                }
-            }
-            set
-            {
-                try
-                {
-                    _batchContentString = Regex.Replace(_batchContentString, "-f\"[^ ]*", "-f\"" + value + "\"");
-                }
-                catch (Exception ex)
-                {
-                    return;
-                }
-
-            }
-        }
-        public string FileNameLog
-        {
-            get 
-            { 
-                if (_batchContentString.Length == 0) return "";
-                try
-                {
-                    string tmpLogVal = Regex.Match(_batchContentString, ">\"? ?[^ ?]*").Groups[0].Value.Replace("\"", "");
-                    return Regex.Replace(tmpLogVal, ">\"? ?", "");
-                }
-                catch (Exception ex)
-                {
-                    return "";
-                }
-            }
-            set
-            {
-                try
-                {
-                    _batchContentString = Regex.Replace(_batchContentString, ">\"? ?[^ ?]*", ">\"" + value + "\"");
-                }
-                catch (Exception ex)
-                {
-                    return;
-                }
-
-            }
-        }
-
-        public string SerialNumber
-        {
-            get 
-            { 
-                if (_batchContentString.Length == 0) return "";
-                try
-                {
-                    return Regex.Match(_batchContentString, "-a[^ ]*").Groups[0].Value.Replace("-a", String.Empty);
-                }
-                catch (Exception ex)
-                {
-                    return "";
-                }
-            }
-        }
-
-        public bool ExistsRDS
-        {
-            get 
-            {
-                if (File.Exists(FileNameRDSLib))
-                    return true;
-                else
-                    return false;
-            }
-        }
-        public bool ExistsDump
-        {
-            get 
-            {
-                if (File.Exists(FileNameDump))
-                    return true;
-                else
-                    return false;
-            }
-        }
-
-        static string _libFolderName = "";
-        static string _dumpFolderName = "";
-        static string _logFolderName = "";
-
-        public static string FolderNameLib
-        {
-            get
-            {
-                return _libFolderName.Length == 0 ? "RDS" : _libFolderName;
-            }
-            set
-            {
-                _libFolderName = value;
-            }
-        }
-        public static string FolderNameDump
-        {
-            get
-            {
-                return _dumpFolderName.Length == 0 ? "Dumps" : _dumpFolderName;
-            }
-            set
-            {
-                _dumpFolderName = value;
-            }
-        }
-        public static string FolderNameLog
-        {
-            get
-            {
-                return _logFolderName.Length == 0 ? FolderNameDump : _logFolderName;
-            }
-            set
-            {
-                _logFolderName = value;
-            }
-        }
-
-        public string GenerateFileName(string postfix)
-        {
-            return DateTime.Now.Date.ToShortDateString().Replace(".", "-") + "_" + SerialNumber + postfix;
-        }
-
-        public void UpdateWithActualData()
-        {
-            Restore();
-
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory; ;
-            FileNameRDSLib = baseDirectory + FolderNameLib + "\\rdslib.exe";
-            FileNameDB = baseDirectory + FolderNameLib + "\\4rmd.gdb";
-
-            string dumpsFolder = baseDirectory + FolderNameLib + "\\" + FolderNameDump;
-            Directory.CreateDirectory(dumpsFolder);
-            FileNameDump = dumpsFolder + "\\" + this.GenerateFileName(".dat");
-
-            if (FolderNameLog.Length == 0) FolderNameLog = FolderNameDump;
-            string logsFolder = baseDirectory + FolderNameLib + "\\" + FolderNameLog;
-            Directory.CreateDirectory(logsFolder);
-            FileNameLog = logsFolder + "\\" + this.GenerateFileName(".log");
-
-            this._batchContentString = Regex.Match(_batchContentString, ".*log\"?").Groups[0].Value;
-        }
-    }
 }
