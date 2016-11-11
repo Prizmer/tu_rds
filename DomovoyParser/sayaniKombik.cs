@@ -508,7 +508,7 @@ namespace Prizmer.Meters
                     DateTime dateCur = DateTime.Now.Date;
                     TimeSpan ts = dateCur - latestDumpDate;
 
-                    if (ts.TotalDays <= readDailyTimeoutInDays)
+                    if (ts.TotalDays < readDailyTimeoutInDays)
                     {
                         return false;
                     }
