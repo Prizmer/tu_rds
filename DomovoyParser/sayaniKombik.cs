@@ -44,7 +44,7 @@ namespace Prizmer.Meters
         bool StopFlag = false;
 
         //время ожидания завершения работы утиллиты rds
-        const int waitRDSTimeInSec = 10;
+        const int waitRDSTimeInSec = 12;
         const byte RecordLength = 32;
         const byte bytesFromTheEnd = 32;
 
@@ -338,7 +338,7 @@ namespace Prizmer.Meters
                         float k = 1;
                         if (tarif > 0 && tarif < 3)
                         {
-                            recordValue = prms.Q[tarif] * k;
+                            recordValue = prms.Q[tarif - 1] * k;
                             return true;
                         }
                         return false;
@@ -349,7 +349,7 @@ namespace Prizmer.Meters
                         float k = 1;
                         if (tarif > 0 && tarif < 5)
                         {
-                            recordValue = prms.T[tarif] * k;
+                            recordValue = prms.T[tarif - 1] * k;
                             return true;
                         }
                         return false;
@@ -360,7 +360,7 @@ namespace Prizmer.Meters
                         float k = 1;
                         if (tarif > 0 && tarif < 5)
                         {
-                            recordValue = prms.M[tarif] * k;
+                            recordValue = prms.M[tarif - 1] * k;
                             return true;
                         }
                         return false;
@@ -490,6 +490,9 @@ namespace Prizmer.Meters
         {
             recordValue = -1;
 
+            MeterInfo tmpMi = new MeterInfo();
+            Params tmpPrms = new Params();
+
             //находится ли в каталоге утилита rdslib.exe
             if (!DoLibraryExists())
                 return false;
@@ -510,7 +513,15 @@ namespace Prizmer.Meters
 
                     if (ts.TotalDays < readDailyTimeoutInDays)
                     {
-                        return false;
+                        bool DELETE_DUMPS_AFTER_PARSING = false;
+                        if (!ParseDumpFile(latestDumpFileName, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
+                            return false;
+
+                        if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
+                            return false;
+
+                        return true;
+                        //return false;
                     }
                     else
                     {
@@ -541,15 +552,12 @@ namespace Prizmer.Meters
             if (!ExecuteBatchConnection(batchConnList[0]))
                 return false;
 
-            MeterInfo tmpMi = new MeterInfo();
-            Params tmpPrms = new Params();
+            //bool DELETE_DUMPS_AFTER_PARSING = false;
+            //if (!ParseDumpFile(batchConnList[0].FileNameDump, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
+            //    return false;
 
-            bool DELETE_DUMPS_AFTER_PARSING = false;
-            if (!ParseDumpFile(batchConnList[0].FileNameDump, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
-                return false;
-
-            if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
-                return false;
+            //if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
+            //    return false;
 
             return true;
         }

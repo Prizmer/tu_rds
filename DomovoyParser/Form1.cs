@@ -830,7 +830,7 @@ namespace DomovoyParser
             if (sayaniKombik.ReadDailyValues(DateTime.Now.Date, (ushort)numP.Value, (ushort)numT.Value, ref val))
                 richTextBox1.Text = "Получено новое значение: " + val.ToString();
             else
-                richTextBox1.Text = "Не удалось получить новое значение, возможно с момента последнего опроса не прошлос " + tbPass.Text + " дней";
+                richTextBox1.Text = "Не удалось получить новое значение, возможно с момента последнего опроса не прошло " + tbPass.Text + " дней";
 
         }
 
