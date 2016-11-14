@@ -299,6 +299,9 @@ namespace DomovoyParser
                 for (int i = 1; i < dt.Columns.Count; i++)
                     dt.Rows[rowIndex][i] = prmsList[i - 1];
 
+
+                dgv1.DataSource = dt;
+
                 return true;
             }
             catch (Exception ex)
@@ -506,7 +509,7 @@ namespace DomovoyParser
                     {
                         this.Invoke((MethodInvoker)delegate()
                         {
-                            PrintLastRecord((int)numericUpDown1.Value, false);
+                            PrintLastRecord((int)numericUpDown1.Value, false, dt, i);
                             PrintMsg("\n");
                         });
                     }
