@@ -507,7 +507,7 @@ namespace DomovoyParser
                        return;
                    }
 
-                   if (File.Exists(batchConnectionList[i].FileNameDump))
+                   if (sayaniKombik.IsDatFileAvailable(batchConnectionList[i].FileNameDump))
                    {
                        tmpRes = true;
                        break;

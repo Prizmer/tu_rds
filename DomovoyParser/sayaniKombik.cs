@@ -257,6 +257,33 @@ namespace Prizmer.Meters
             return true;
         }
 
+
+        public bool IsDatFileAvailable(string fileName)
+        {
+            FileStream testFs;
+            if (File.Exists(fileName))
+            {
+                try
+                {
+                    testFs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    MeterInfo testMi = new MeterInfo();
+                    bool res = GetMeterInfo(testFs, ref testMi);
+                    testFs.Close();
+                    
+                    return res;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
         private bool ExecuteBatchConnection(BatchConnection batchConn)
         {
             string tmpCmd = batchConn.Command;
@@ -284,8 +311,9 @@ namespace Prizmer.Meters
                 if (StopFlag)
                     break;
 
-                if (File.Exists(batchConn.FileNameDump))
+                if (IsDatFileAvailable(batchConn.FileNameDump))
                 {
+                    
                     tmpRes = true;
                     break;
                 }
