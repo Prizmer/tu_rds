@@ -38,6 +38,9 @@ namespace DomovoyParser
             folderBrowserDialog.SelectedPath = AppDomain.CurrentDomain.BaseDirectory;
             folderBrowserDialog.Description = "Выберите дирректорию, содержащую файлы *.bat";
 
+            sfd1.Filter = "Таблица Excel (*.xls) | *.xls";
+            sfd1.FileName = "САЯНЫ показания";
+
             numResponseTimeout.Value = 8;
 
             BatchConnectionList = new List<BatchConnection>();
@@ -74,6 +77,7 @@ namespace DomovoyParser
         FormConnPrms connectionParamForm = new FormConnPrms();
 
         OpenFileDialog openFileDialog;
+        SaveFileDialog sfd1 = new SaveFileDialog();
         FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
 
         FileStream fStreamDump;
@@ -923,7 +927,6 @@ namespace DomovoyParser
 
         }
 
-        SaveFileDialog sfd1 = new SaveFileDialog();
         private void tsExportBtn_Click(object sender, EventArgs e)
         {
             if (sfd1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
