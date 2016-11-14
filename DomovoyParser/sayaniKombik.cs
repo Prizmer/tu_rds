@@ -453,11 +453,10 @@ namespace Prizmer.Meters
 
         public bool DeleteDumpFileAndLogs(string dumpFileName)
         {
-
-            File.Delete(dumpFileName);
-
             try
             {
+                File.Delete(dumpFileName);
+
                 //разберемся с файлом лога
                 string logDir = Path.GetDirectoryName(dumpFileName);
                 string logFName = Path.GetFileNameWithoutExtension(dumpFileName);

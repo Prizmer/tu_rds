@@ -412,10 +412,13 @@ namespace DomovoyParser
                         PrintLastRecord((int)numericUpDown1.Value);
                         InitDumpReaderMode(filename);
                     }
+
+                    fStreamDump.Close();
                     return true;
                 }
                 else
                 {
+                    fStreamDump.Close();
                     richTextBox1.Clear();
                     richTextBox1.Text += String.Format("Ошибка. Вероятно файл поврежден. Прочитанное: {0}.", tmpMeterInfo.serialNumber);
                     return false;
@@ -423,6 +426,7 @@ namespace DomovoyParser
             }
             catch (Exception ex)
             {
+                fStreamDump.Close();
                 return false;
             }
         }
