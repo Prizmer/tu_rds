@@ -480,7 +480,7 @@ namespace Prizmer.Meters
 
                 //разберемся с файлом лога
                 string logFullFileName = "";
-                ReplaceExtensionInFileName(dumpFileName, "*.log", ref logFullFileName);
+                ReplaceExtensionInFileName(dumpFileName, ".log", ref logFullFileName);
 
                 //уберем метаданные
                 DeleteDumpMeta(dumpFileName);
@@ -501,7 +501,7 @@ namespace Prizmer.Meters
         public bool SetDumpMeta(string dumpFileName, DumpMeta dumpMeta)
         {
             string metaFileName = "";
-            ReplaceExtensionInFileName(dumpFileName, "*.xls", ref metaFileName);
+            ReplaceExtensionInFileName(dumpFileName, ".xml", ref metaFileName);
 
             try
             {
@@ -518,7 +518,7 @@ namespace Prizmer.Meters
         public bool GetDumpMeta(string dumpFileName, ref DumpMeta dumpMeta)
         {
             string metaFileName = "";
-            ReplaceExtensionInFileName(dumpFileName, "*.xls", ref metaFileName);
+            ReplaceExtensionInFileName(dumpFileName, ".xml", ref metaFileName);
 
             try
             {
@@ -575,8 +575,7 @@ namespace Prizmer.Meters
             {
                 dm.ReadParamIdsList = new List<int>();
                 dm.ReadParamIdsList.Add(param);
-                SetDumpMeta(dumpFileName, dm);
-                return true;
+                return SetDumpMeta(dumpFileName, dm);
             }
 
             return false;

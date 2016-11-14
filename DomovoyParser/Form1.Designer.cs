@@ -456,7 +456,7 @@
             this.tbSerial.Name = "tbSerial";
             this.tbSerial.Size = new System.Drawing.Size(100, 20);
             this.tbSerial.TabIndex = 16;
-            this.tbSerial.Text = "2260";
+            this.tbSerial.Text = "2460";
             this.toolTip1.SetToolTip(this.tbSerial, "Последние 4 цифры десятичного серийника");
             // 
             // numT
