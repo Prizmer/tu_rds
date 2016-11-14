@@ -411,9 +411,9 @@ namespace DomovoyParser
                     {
                         PrintLastRecord((int)numericUpDown1.Value);
                         InitDumpReaderMode(filename);
+                        fStreamDump.Close();
                     }
 
-                    fStreamDump.Close();
                     return true;
                 }
                 else
@@ -536,6 +536,9 @@ namespace DomovoyParser
                            PrintMsg("\n");
                        });
                    }
+
+                   if (fStreamDump != null)
+                       fStreamDump.Close();
 
                   sayaniKombik.DeleteDumpFileAndLogs(bConn.FileNameDump);
                }
