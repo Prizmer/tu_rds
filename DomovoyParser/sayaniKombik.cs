@@ -502,16 +502,19 @@ namespace Prizmer.Meters
         {
             string metaFileName = "";
             ReplaceExtensionInFileName(dumpFileName, ".xml", ref metaFileName);
-
+            
+            FileStream metaFileStream = null;
             try
             {
-                FileStream metaFileStream = new FileStream(metaFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                metaFileStream = new FileStream(metaFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
                 formatter.Serialize(metaFileStream, dumpMeta);
                 metaFileStream.Close();
                 return true;
             }
             catch (Exception ex)
             {
+                if (metaFileStream != null)
+                    metaFileStream.Close();
                 return false;
             }
         }
@@ -520,15 +523,19 @@ namespace Prizmer.Meters
             string metaFileName = "";
             ReplaceExtensionInFileName(dumpFileName, ".xml", ref metaFileName);
 
+            FileStream metaFileStream = null;
             try
             {
-                FileStream metaFileStream = new FileStream(metaFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                metaFileStream = new FileStream(metaFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
                 dumpMeta = (DumpMeta)formatter.Deserialize(metaFileStream);
                 metaFileStream.Close();
                 return true;
             }
             catch (Exception ex)
             {
+                if (metaFileStream != null)
+                    metaFileStream.Close();
+
                 return false;
             }
         }
