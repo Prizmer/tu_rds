@@ -721,7 +721,8 @@ namespace Prizmer.Meters
             if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
                 return false;
 
-            DumpMetaAppendParam(latestDumpFileName, param);
+
+            DumpMetaAppendParam(batchConnList[0].FileNameDump, param);
 
             return true;
         }
