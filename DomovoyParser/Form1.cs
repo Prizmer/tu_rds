@@ -41,7 +41,7 @@ namespace DomovoyParser
             sfd1.Filter = "Таблица Excel (*.xls) | *.xls";
             sfd1.FileName = "САЯНЫ показания";
 
-            numResponseTimeout.Value = 8;
+            numResponseTimeout.Value = 60;
 
             BatchConnectionList = new List<BatchConnection>();
 
@@ -401,21 +401,28 @@ namespace DomovoyParser
         MeterInfo tmpMeterInfo = new MeterInfo();
         private bool loadDumpFile(string filename, bool doDumpMode = true)
         {
-            fStreamDump = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            try
+            {
+                fStreamDump = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            if (GetMeterInfo(fStreamDump, ref tmpMeterInfo))
-            {
-                if (doDumpMode)
+                if (GetMeterInfo(fStreamDump, ref tmpMeterInfo))
                 {
-                    PrintLastRecord((int)numericUpDown1.Value);
-                    InitDumpReaderMode(filename);
+                    if (doDumpMode)
+                    {
+                        PrintLastRecord((int)numericUpDown1.Value);
+                        InitDumpReaderMode(filename);
+                    }
+                    return true;
                 }
-                return true;
+                else
+                {
+                    richTextBox1.Clear();
+                    richTextBox1.Text += String.Format("Ошибка. Вероятно файл поврежден. Прочитанное: {0}.", tmpMeterInfo.serialNumber);
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                richTextBox1.Clear();
-                richTextBox1.Text += String.Format("Ошибка. Вероятно файл поврежден. Прочитанное: {0}.", tmpMeterInfo.serialNumber);
                 return false;
             }
         }
@@ -482,7 +489,7 @@ namespace DomovoyParser
                 psiOpt.CreateNoWindow = true;
                 // запускаем процесс
                 Process procCommand = Process.Start(psiOpt);
-               procCommand.StandardInput.WriteLine(tmpCmd);
+                procCommand.StandardInput.WriteLine(tmpCmd);
 
                this.Invoke((MethodInvoker)delegate()
                {
@@ -490,13 +497,21 @@ namespace DomovoyParser
                    timerProgressBar.Value = 0;
                });
 
+
+               bool tmpRes = false;
                for (int t = 0; t < (int)numResponseTimeout.Value; t++)
                {
                    if (StopFlag)
                    {
                        BatchFileExecutionEnd_EventHandler(null, new EventArgs());
                        return;
-                   } 
+                   }
+
+                   if (File.Exists(batchConnectionList[i].FileNameDump))
+                   {
+                       tmpRes = true;
+                       break;
+                   }
 
                    Thread.Sleep(1000);
 
@@ -507,32 +522,33 @@ namespace DomovoyParser
 
                }
 
-                if (File.Exists(bConn.FileNameDump))
-                {
-                    if (loadDumpFile(bConn.FileNameDump, false))
-                    {
-                        this.Invoke((MethodInvoker)delegate()
-                        {
-                            PrintLastRecord((int)numericUpDown1.Value, false, dt, i+1);
-                            PrintMsg("\n");
-                        });
-                    }
+               if (tmpRes)
+               {
+                   if (loadDumpFile(bConn.FileNameDump, false))
+                   {
+                       this.Invoke((MethodInvoker)delegate()
+                       {
+                           PrintLastRecord((int)numericUpDown1.Value, false, dt, i + 1);
+                           PrintMsg("\n");
+                       });
+                   }
 
-                    File.Delete(bConn.FileNameDump + bConn.GenerateFileName(".dat"));
-                }
-                else
-                {
-                    try
-                    {
-                        procCommand.CloseMainWindow();
-                    }
-                    catch (Exception ex)
-                    {
+                   File.Delete(bConn.FileNameDump + bConn.GenerateFileName(".dat"));
+               }
+               else
+               {
+                   try
+                   {
+                       procCommand.CloseMainWindow();
+                   }
+                   catch (Exception ex)
+                   {
 
-                    }
+                   }
 
-                    PrintMsg(String.Format("{0}: не найден файл дампа {1}, ошибка чтения.\n\n", bConn.SerialNumber, bConn.FileNameDump));
-                }
+                   PrintMsg(String.Format("{0}: не найден файл дампа {1}, ошибка чтения.\n\n", bConn.SerialNumber, bConn.FileNameDump));
+               }
+
 
                 BatchFileTriedEvent.Invoke(null, new EventArgs());
             }

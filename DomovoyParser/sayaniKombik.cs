@@ -68,7 +68,7 @@ namespace Prizmer.Meters
         bool StopFlag = false;
 
         //время ожидания завершения работы утиллиты rds
-        const int waitRDSTimeInSec = 12;
+        const int waitRDSTimeInSec = 60;
         const byte RecordLength = 32;
         const byte bytesFromTheEnd = 32;
 
@@ -278,11 +278,17 @@ namespace Prizmer.Meters
             Process procCommand = Process.Start(psiOpt);
             procCommand.StandardInput.WriteLine(tmpCmd);
 
-
+            bool tmpRes = false;
             for (int t = 0; t < waitRDSTimeInSec; t++)
             {
                 if (StopFlag)
-                    return false;
+                    break;
+
+                if (File.Exists(batchConn.FileNameDump))
+                {
+                    tmpRes = true;
+                    break;
+                }
 
                 Thread.Sleep(1000);
             }
@@ -294,14 +300,7 @@ namespace Prizmer.Meters
             catch (Exception ex)
             { }
 
-            if (File.Exists(batchConn.FileNameDump))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return tmpRes;
         }
 
         private bool ParseDumpFile(string fileName, ref MeterInfo mi, ref Params prms, bool deleteAfterParse = false)
@@ -314,19 +313,27 @@ namespace Prizmer.Meters
                 return false;
 
 
-            FileStream dumpFileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            try
+            {
+                FileStream dumpFileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            bool tmpRes = false;
-            if (GetMeterInfo(dumpFileStream, ref mi))
-                if (GetParamValues(dumpFileStream, bytesFromTheEnd, ref prms, ref strValues))
-                    tmpRes = true;
+                bool tmpRes = false;
+                if (GetMeterInfo(dumpFileStream, ref mi))
+                    if (GetParamValues(dumpFileStream, bytesFromTheEnd, ref prms, ref strValues))
+                        tmpRes = true;
 
-            dumpFileStream.Close();
+                dumpFileStream.Close();
 
-            if (tmpRes && deleteAfterParse)
-                DeleteDumpFileAndLogs(fileName);
+                if (tmpRes && deleteAfterParse)
+                    DeleteDumpFileAndLogs(fileName);
 
-            return tmpRes;
+
+                return tmpRes;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         private bool GetParamValueFromParams(Params prms, ushort param, ushort tarif, out float recordValue)

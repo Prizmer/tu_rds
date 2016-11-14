@@ -38,6 +38,8 @@
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openTSMI = new System.Windows.Forms.ToolStripMenuItem();
             this.openDirTSMI = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsExportBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.инструментыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connPrmsTSMI = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -67,8 +69,6 @@
             this.numP = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dgv1 = new System.Windows.Forms.DataGridView();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsExportBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.grBoxDump.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -163,6 +163,19 @@
             this.openDirTSMI.Size = new System.Drawing.Size(261, 22);
             this.openDirTSMI.Text = "Выбрать дирректорию";
             this.openDirTSMI.Click += new System.EventHandler(this.openDirTSMI_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(258, 6);
+            // 
+            // tsExportBtn
+            // 
+            this.tsExportBtn.Name = "tsExportBtn";
+            this.tsExportBtn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
+            this.tsExportBtn.Size = new System.Drawing.Size(261, 22);
+            this.tsExportBtn.Text = "Экспорт *.xls";
+            this.tsExportBtn.Click += new System.EventHandler(this.tsExportBtn_Click);
             // 
             // инструментыToolStripMenuItem
             // 
@@ -365,12 +378,12 @@
             // 
             this.numResponseTimeout.Location = new System.Drawing.Point(152, 14);
             this.numResponseTimeout.Maximum = new decimal(new int[] {
-            50,
+            180,
             0,
             0,
             0});
             this.numResponseTimeout.Minimum = new decimal(new int[] {
-            5,
+            30,
             0,
             0,
             0});
@@ -378,7 +391,7 @@
             this.numResponseTimeout.Size = new System.Drawing.Size(60, 20);
             this.numResponseTimeout.TabIndex = 13;
             this.numResponseTimeout.Value = new decimal(new int[] {
-            8,
+            30,
             0,
             0,
             0});
@@ -505,19 +518,6 @@
             this.dgv1.RowHeadersVisible = false;
             this.dgv1.Size = new System.Drawing.Size(660, 184);
             this.dgv1.TabIndex = 15;
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(258, 6);
-            // 
-            // tsExportBtn
-            // 
-            this.tsExportBtn.Name = "tsExportBtn";
-            this.tsExportBtn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.tsExportBtn.Size = new System.Drawing.Size(261, 22);
-            this.tsExportBtn.Text = "Экспорт *.xls";
-            this.tsExportBtn.Click += new System.EventHandler(this.tsExportBtn_Click);
             // 
             // Form1
             // 
