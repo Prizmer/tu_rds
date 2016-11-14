@@ -533,7 +533,7 @@ namespace DomovoyParser
                        });
                    }
 
-                   File.Delete(bConn.FileNameDump + bConn.GenerateFileName(".dat"));
+                  sayaniKombik.DeleteDumpFileAndLogs(bConn.FileNameDump);
                }
                else
                {
@@ -546,7 +546,7 @@ namespace DomovoyParser
 
                    }
 
-                   PrintMsg(String.Format("{0}: не найден файл дампа {1}, ошибка чтения.\n\n", bConn.SerialNumber, bConn.FileNameDump));
+                   PrintMsg(String.Format("{0}: не найден файл дампа {1}, ошибка чтения.\n\n", bConn.SerialNumberDec2Bytes, bConn.FileNameDump));
                }
 
 

@@ -451,7 +451,7 @@ namespace Prizmer.Meters
         }
 
 
-        private bool DeleteDumpFileAndLogs(string dumpFileName)
+        public bool DeleteDumpFileAndLogs(string dumpFileName)
         {
 
             File.Delete(dumpFileName);
