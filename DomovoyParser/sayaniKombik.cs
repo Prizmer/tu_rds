@@ -47,7 +47,7 @@ namespace Prizmer.Meters
     [Serializable]
     public struct DumpMeta
     {
-        public List<int> ReadParamIdsList;
+        public List<string> paramList;
     }
 
     public class sayani_kombik : CMeter, IMeter
@@ -86,7 +86,6 @@ namespace Prizmer.Meters
 
         // передаем в конструктор тип класса
         XmlSerializer formatter = new XmlSerializer(typeof(DumpMeta));
-        DumpMeta _dumpMeta = new DumpMeta();
 
 
 
@@ -552,36 +551,42 @@ namespace Prizmer.Meters
             }
         }
 
-        public bool DumpMetaParamExists(string dumpFileName, int param)
+        string metaPairSeparator = ";";
+        public bool DumpMetaParamsExist(string dumpFileName, int param, int tarif)
         {
             DumpMeta dm = new DumpMeta();
-            if (GetDumpMeta(dumpFileName, ref dm))
+            if (GetDumpMeta(dumpFileName, ref dm) && dm.paramList != null && dm.paramList.Count > 0)
             {
-                List<int> readParamIdsList = dm.ReadParamIdsList;
-                return readParamIdsList.Exists((x) => { return x == param; });               
+                for (int i = 0; i < dm.paramList.Count; i++)
+                {
+                    string tmp = dm.paramList[i];
+                    if (tmp == param + metaPairSeparator + tarif)
+                        return true;
+                }          
             }
 
             return false;
         }
-        public bool DumpMetaAppendParam(string dumpFileName, int param)
+        public bool DumpMetaAppendParams(string dumpFileName, int param, int tarif)
         {
             DumpMeta dm = new DumpMeta();
-            if (GetDumpMeta(dumpFileName, ref dm))
+            if (GetDumpMeta(dumpFileName, ref dm) && dm.paramList != null && dm.paramList.Count > 0)
             {
-                if (dm.ReadParamIdsList.Exists((x) => { return x == param; }))
+                for (int i = 0; i < dm.paramList.Count; i++)
                 {
-                    return true;
+                    string tmp = dm.paramList[i];
+                    if (tmp == param + metaPairSeparator + tarif)
+                        return true;
                 }
-                else
-                {
-                    dm.ReadParamIdsList.Add(param);
-                    SetDumpMeta(dumpFileName, dm);
-                }
+
+                dm.paramList.Add(param + metaPairSeparator + tarif);
+                return SetDumpMeta(dumpFileName, dm);
             }
             else
             {
-                dm.ReadParamIdsList = new List<int>();
-                dm.ReadParamIdsList.Add(param);
+                dm.paramList = new List<string>();
+                dm.paramList.Add(param + metaPairSeparator + tarif);
+
                 return SetDumpMeta(dumpFileName, dm);
             }
 
@@ -668,19 +673,19 @@ namespace Prizmer.Meters
 
                     //если прошло <= N дней и искомый параметр уже считан, однозначно выходим
                     if ((ts.TotalDays < readDailyTimeoutInDays) &&
-                        (DumpMetaParamExists(latestDumpFileName, param)))
+                        (DumpMetaParamsExist(latestDumpFileName, param, tarif)))
                     {
                         return false;
                     }
                     //если прошло менее N дней, но искомого параметра еще нет
-                    else if (!DumpMetaParamExists(latestDumpFileName, param))
+                    else if (!DumpMetaParamsExist(latestDumpFileName, param, tarif))
                     {
                         //прочитаем недостающий параметр из уже существующего дампа
                         //чтобы не дергать счетчик
                         if (ParseDumpFile(latestDumpFileName, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
                             if (GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
                             {
-                                DumpMetaAppendParam(latestDumpFileName, param);
+                                DumpMetaAppendParams(latestDumpFileName, param, tarif);
                                 return true;
                             }                  
                     }
@@ -722,7 +727,7 @@ namespace Prizmer.Meters
                 return false;
 
 
-            DumpMetaAppendParam(batchConnList[0].FileNameDump, param);
+            DumpMetaAppendParams(batchConnList[0].FileNameDump, param, tarif);
 
             return true;
         }
