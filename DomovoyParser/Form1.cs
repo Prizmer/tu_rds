@@ -13,8 +13,11 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
 
+using ExcelLibrary.SpreadSheet;
+
 using Prizmer.Meters;
 using Prizmer.Meters.iMeters;
+
 
 namespace DomovoyParser
 {
@@ -75,32 +78,144 @@ namespace DomovoyParser
 
         FileStream fStreamDump;
 
+
+        DataTable dt = new DataTable("meters");
+        public string worksheetName = "Лист1";
+
+        //список, хранящий номера параметров в перечислении Params драйвера
+        //целесообразно его сделать здесь, так как кол-во считываемых значений зависит от кол-ва колонок
+        List<int> paramCodes = null;
+        private void createMainTable(ref DataTable dt)
+        {
+            paramCodes = new List<int>();
+
+            //creating columns for internal data table
+            DataColumn column = dt.Columns.Add();
+
+            column.DataType = typeof(string);
+            column.Caption = "S/N";
+            column.ColumnName = "colFactory";
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "Q1 (МДж)";
+            column.ColumnName = "colEnergy1";
+            paramCodes.Add(1);
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "Q2 (МДж)";
+            column.ColumnName = "colEnergy2";
+            paramCodes.Add(2);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "M1 (кг)";
+            column.ColumnName = "colMass1";
+            paramCodes.Add(3);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "M2 (кг)";
+            column.ColumnName = "colMass2";
+            paramCodes.Add(4);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "M3 (кг)";
+            column.ColumnName = "colMass3";
+            paramCodes.Add(5);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "M4 (кг)";
+            column.ColumnName = "colMass4";
+            paramCodes.Add(6);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "T1 (*C)";
+            column.ColumnName = "colTemp1";
+            paramCodes.Add(7);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "T2 (*C)";
+            column.ColumnName = "colTemp2";
+            paramCodes.Add(8);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "T3 (*C)";
+            column.ColumnName = "colTemp3";
+            paramCodes.Add(9);
+
+            column = dt.Columns.Add();
+            column.DataType = typeof(string);
+            column.Caption = "T4 (*C)";
+            column.ColumnName = "colTemp4";
+            paramCodes.Add(10);
+
+            DataRow captionRow = dt.NewRow();
+            for (int i = 0; i < dt.Columns.Count; i++)
+                captionRow[i] = dt.Columns[i].Caption;
+            dt.Rows.Add(captionRow);
+
+        }
+
+        private void fillTableWithStartData(List<BatchConnection> bcList)
+        {
+            try
+            {
+                Workbook book = new Workbook();
+                book.Worksheets.Add(new Worksheet("Лист 1"));
+
+                //auto detection of working mode
+                object typeDirectiveVal = "";
+
+                try
+                {
+                    Row zeroRow = book.Worksheets[0].Cells.GetRow(0);
+                    typeDirectiveVal = zeroRow.GetCell(0).Value;
+                }
+                catch (Exception ex)
+                {
+                    return;
+                }
+
+                dt = new DataTable();
+                createMainTable(ref dt);
+
+                int rowsInFile = bcList.Count;
+
+                //filling internal data table with *.xls file data according to *.config file
+                for (int i = 0; i < 1; i++)
+                {
+                    Worksheet sheet = book.Worksheets[i];
+
+                    for (int rowIndex = 0; rowIndex < rowsInFile; rowIndex++)
+                    {
+                        DataRow dataRow = dt.NewRow();
+                        dataRow[0] = bcList[rowIndex].SerialNumberDec2Bytes;
+
+                        for (int j = 1; j < dt.Columns.Count; j++)
+                            dataRow[j] = "";
+
+                        dt.Rows.Add(dataRow);
+                    }
+                }
+
+                dgv1.DataSource = dt;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Проблемы с формированием таблицы для dgv1", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
         #region Разбор дампа
 
-        public struct Params
-        {
-            /**   2 bytes   **/
-            public float[] Q;    //Q1-Q2
-            public float[] T;    //T1-T4
-            public float[] M;    //M1-M4
-            public float V5;
-
-            /**   1 byte   **/
-            public float[] P;    //P1-P4 
-
-
-            public int[] NC;     //NC1-NC2
-            public int TimeMinutes1;
-            public int VoltsBattery;
-            public int TimeMinutes2;
-            public int Reserved;
-        };
-        public struct MeterInfo
-        {
-            public string serialNumber;
-        };
-
-        private int GiveMeValue(FileStream fs, int valBytesCount)
+        private int GiveMeNextValue(FileStream fs, int valBytesCount)
         {
             try
             {
@@ -159,91 +274,62 @@ namespace DomovoyParser
 
         #region Принтеры
 
-        private void PrintLastRecord(int bytesFromTheEnd, bool bClearBefore = true)
+        private bool FillRowWithValues(Params prms, DataTable dt, int rowIndex, bool FillWithEmptyVals = false)
         {
-            bool doPrint = true;
+            try
+            {
+                List<float> prmsList = new List<float>();
 
+                if (!FillWithEmptyVals)
+                {
+                    prmsList.Add(prms.Q[0]);
+                    prmsList.Add(prms.Q[1]);
+
+                    prmsList.Add(prms.M[0]);
+                    prmsList.Add(prms.M[1]);
+                    prmsList.Add(prms.M[2]);
+                    prmsList.Add(prms.M[3]);
+
+                    prmsList.Add(prms.T[0]);
+                    prmsList.Add(prms.T[1]);
+                    prmsList.Add(prms.T[2]);
+                    prmsList.Add(prms.T[3]);
+                }
+
+                for (int i = 1; i < dt.Columns.Count; i++)
+                    dt.Rows[rowIndex][i] = prmsList[i - 1];
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private void PrintLastRecord(int bytesFromTheEnd, bool bClearBefore = true, DataTable dt = null, int rowIndex = -1)
+        {
             if (fStreamDump != null)
             {
                 if (bClearBefore) richTextBox1.Clear();
 
-                int lastFileByteIndex = (int)(fStreamDump.Length);
-                long lastRecordFirstIndex = lastFileByteIndex - bytesFromTheEnd - RecordLength;
-                fStreamDump.Seek((int)lastRecordFirstIndex, SeekOrigin.Begin);
-
-                Params p = new Params();
+                Params prms = new Params();
 
                 richTextBox1.Text += String.Format("***[ S/N: {0} ]***\n", tmpMeterInfo.serialNumber);
 
-                p.Q = new float[2];
-                for (int i = 0; i < 2; i++)
+                string strRepresentation = "";
+                if (!sayaniKombik.GetParamValues(fStreamDump, bytesFromTheEnd, ref prms, ref strRepresentation))
+                    richTextBox1.Text += "Ошибка разбора дампа\n";
+
+                richTextBox1.Text += strRepresentation;
+
+                //добавим в таблицу строку
+                if (dt != null && rowIndex != -1)
                 {
-                    p.Q[i] = (float)GiveMeValue(fStreamDump, 2);
-                    if (doPrint) richTextBox1.Text += String.Format("Q{0}: {1}{2}; ", i + 1, p.Q[i], "");
+                    FillRowWithValues(prms, dt, rowIndex);
+                    dgv1.DataSource = dt;
                 }
 
-                if (false) richTextBox1.Text += "\n";
-                p.T = new float[4];
-                for (int i = 0; i < 4; i++)
-                {
-                    p.T[i] = (float)GiveMeValue(fStreamDump, 2);
-                    if (doPrint) richTextBox1.Text += String.Format("T{0}: {1}{2}; ", i + 1, p.T[i], "");
-                }
-
-                if (false) richTextBox1.Text += "\n";
-                p.M = new float[4];
-                for (int i = 0; i < 4; i++)
-                {
-                    p.M[i] = (float)GiveMeValue(fStreamDump, 2);
-                    if (doPrint) richTextBox1.Text += String.Format("M{0}: {1}{2}; ", i + 1, p.M[i], "");
-                }
-
-                if (false) richTextBox1.Text += "\n";
-                p.V5 = (float)GiveMeValue(fStreamDump, 2);
-                if (doPrint) richTextBox1.Text += String.Format("V{0}: {1}{2}; ", 5, p.V5, "");
-
-                if (false) richTextBox1.Text += "\n";
-                p.P = new float[4];
-                for (int i = 0; i < 4; i++)
-                {
-                    p.P[i] = (float)GiveMeValue(fStreamDump, 1);
-                    if (doPrint) richTextBox1.Text += String.Format("P{0}: {1}{2}; ", i + 1, p.P[i], "");
-                }
-
-                if (true) richTextBox1.Text += "\n";
-                p.NC = new int[2];
-                for (int i = 0; i < 2; i++)
-                {
-                    p.NC[i] = GiveMeValue(fStreamDump, 1);
-
-                    string sNCDescription = "";
-                    if (((p.NC[i] >> 0) & 0x01) == 0x01) sNCDescription += "Ошибка термодатчика 1;";
-                    if (((p.NC[i] >> 1) & 0x01) == 0x01) sNCDescription += "Ошибка термодатчика 2;";
-                    if (((p.NC[i] >> 2) & 0x01) == 0x01) sNCDescription += "T1<T2 или T1-T2 меньше порога;";
-                    if (((p.NC[i] >> 3) & 0x01) == 0x01) sNCDescription += "Т2<Tх;";
-                    if (((p.NC[i] >> 4) & 0x01) == 0x01) sNCDescription += "dQ1<0;";
-                    if (((p.NC[i] >> 5) & 0x01) == 0x01) sNCDescription += "нет внешнего питания;";
-                    if (((p.NC[i] >> 6) & 0x01) == 0x01) sNCDescription += "проводилась коррекция времени;";
-                    if (((p.NC[i] >> 7) & 0x01) == 0x01) sNCDescription += "изменялось содержимое EEPROM;";
-
-                    if (sNCDescription == "") sNCDescription = "OK";
-
-                    if (doPrint) richTextBox1.Text += String.Format("Вычислитель {0}: {1} [{2}];\n", i + 1, p.NC[i], sNCDescription);
-
-                }
-
-                p.TimeMinutes1 = GiveMeValue(fStreamDump, 1);
-                p.VoltsBattery = GiveMeValue(fStreamDump, 1);
-                p.TimeMinutes2 = GiveMeValue(fStreamDump, 1);
-                p.Reserved = GiveMeValue(fStreamDump, 1);
-
-                if (doPrint)
-                {
-                    richTextBox1.Text += String.Format("Time{0}: {1}{2}; ", 1, p.TimeMinutes1, "");
-                    richTextBox1.Text += String.Format("Time{0}: {1}{2}; ", 2, p.TimeMinutes2, "");
-                    richTextBox1.Text += String.Format("Battery{0}: {1}{2}; ", "", p.VoltsBattery, " Volts");
-                    richTextBox1.Text += String.Format("Reserved{0}: {1}{2}; ", "", p.Reserved, "");
-                }
 
                 if (!bClearBefore)
                     richTextBox1.Text += "\n";
@@ -497,8 +583,6 @@ namespace DomovoyParser
             Invoke(del);
         }
 
-
-
         #endregion
 
         private bool CreateBatchConnectionList(List<FileInfo> fileInfoList, ref List<BatchConnection> batchConnectionList)
@@ -517,6 +601,8 @@ namespace DomovoyParser
                     batchConnectionList.Add(bConn);
                     sr.Close();
                     fs.Close();
+
+                    fillTableWithStartData(batchConnectionList);
                 }
                 catch (Exception ex)
                 {
@@ -834,10 +920,35 @@ namespace DomovoyParser
 
         }
 
+        SaveFileDialog sfd1 = new SaveFileDialog();
+        private void tsExportBtn_Click(object sender, EventArgs e)
+        {
+            if (sfd1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                //create new xls file
+                string file = sfd1.FileName;
+                Workbook workbook = new Workbook();
+                Worksheet worksheet = new Worksheet(worksheetName);
+
+                //office 2010 will not open file if there is less than 100 cells
+                for (int i = 0; i < 100; i++)
+                    worksheet.Cells[i, 0] = new Cell("");
+
+                //copying data from data table
+                for (int rowIndex = 0; rowIndex < dt.Rows.Count; rowIndex++)
+                {
+                    for (int colIndex = 0; colIndex < dt.Columns.Count; colIndex++)
+                    {
+                        worksheet.Cells[rowIndex, colIndex] = new Cell(dt.Rows[rowIndex][colIndex].ToString());
+                    }
+                }
+
+                workbook.Worksheets.Add(worksheet);
+                workbook.Save(file);
+            }
+        }
+
         #endregion
-
-
-
     }
 
 }

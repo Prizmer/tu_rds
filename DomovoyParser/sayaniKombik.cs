@@ -19,6 +19,30 @@ using System.Globalization;
 
 namespace Prizmer.Meters
 {
+
+    public struct Params
+    {
+        /**   2 bytes   **/
+        public float[] Q;    //Q1-Q2
+        public float[] T;    //T1-T4
+        public float[] M;    //M1-M4
+        public float V5;
+
+        /**   1 byte   **/
+        public float[] P;    //P1-P4 
+
+
+        public int[] NC;     //NC1-NC2
+        public int TimeMinutes1;
+        public int VoltsBattery;
+        public int TimeMinutes2;
+        public int Reserved;
+    };
+    public struct MeterInfo
+    {
+        public string serialNumber;
+    };
+
     public class sayani_kombik : CMeter, IMeter
     {
         ~sayani_kombik()
@@ -54,28 +78,7 @@ namespace Prizmer.Meters
         string directoryBase = "";
 
 
-        public struct Params
-        {
-            /**   2 bytes   **/
-            public float[] Q;    //Q1-Q2
-            public float[] T;    //T1-T4
-            public float[] M;    //M1-M4
-            public float V5;
 
-            /**   1 byte   **/
-            public float[] P;    //P1-P4 
-
-
-            public int[] NC;     //NC1-NC2
-            public int TimeMinutes1;
-            public int VoltsBattery;
-            public int TimeMinutes2;
-            public int Reserved;
-        };
-        public struct MeterInfo
-        {
-            public string serialNumber;
-        };
 
         #region Низкоуровневый разбор дампа
 
@@ -103,7 +106,7 @@ namespace Prizmer.Meters
                 return -2;
             }
         }
-        private bool GetParamValues(FileStream fs, int bytesFromTheEnd, ref Params prms, ref string strRepresentation)
+        public bool GetParamValues(FileStream fs, int bytesFromTheEnd, ref Params prms, ref string strRepresentation)
         {
             strRepresentation = "";
 

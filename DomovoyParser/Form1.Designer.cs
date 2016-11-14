@@ -66,6 +66,9 @@
             this.numT = new System.Windows.Forms.NumericUpDown();
             this.numP = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.dgv1 = new System.Windows.Forms.DataGridView();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsExportBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.grBoxDump.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -77,6 +80,7 @@
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numT)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numP)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv1)).BeginInit();
             this.SuspendLayout();
             // 
             // richTextBox1
@@ -88,7 +92,7 @@
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
             this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.richTextBox1.Size = new System.Drawing.Size(660, 205);
+            this.richTextBox1.Size = new System.Drawing.Size(660, 81);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             this.richTextBox1.DoubleClick += new System.EventHandler(this.richTextBox1_DoubleClick);
@@ -96,7 +100,7 @@
             // grBoxDump
             // 
             this.grBoxDump.Controls.Add(this.button2);
-            this.grBoxDump.Location = new System.Drawing.Point(206, 249);
+            this.grBoxDump.Location = new System.Drawing.Point(206, 304);
             this.grBoxDump.Name = "grBoxDump";
             this.grBoxDump.Size = new System.Drawing.Size(111, 132);
             this.grBoxDump.TabIndex = 6;
@@ -134,7 +138,9 @@
             // 
             this.файлToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openTSMI,
-            this.openDirTSMI});
+            this.openDirTSMI,
+            this.toolStripMenuItem1,
+            this.tsExportBtn});
             this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             this.файлToolStripMenuItem.Size = new System.Drawing.Size(45, 20);
             this.файлToolStripMenuItem.Text = "Файл";
@@ -181,7 +187,7 @@
             this.tsLblCurrentFile,
             this.toolStripStatusLabel2,
             this.tsLblTotalFiles});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 390);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 442);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(684, 22);
             this.statusStrip1.TabIndex = 9;
@@ -217,7 +223,7 @@
             this.grBoxBat.Controls.Add(this.numBatchFileNum);
             this.grBoxBat.Controls.Add(this.btnExecFile);
             this.grBoxBat.Controls.Add(this.btnListOpenedFiles);
-            this.grBoxBat.Location = new System.Drawing.Point(12, 249);
+            this.grBoxBat.Location = new System.Drawing.Point(12, 304);
             this.grBoxBat.Name = "grBoxBat";
             this.grBoxBat.Size = new System.Drawing.Size(188, 132);
             this.grBoxBat.TabIndex = 12;
@@ -298,7 +304,7 @@
             this.geBoxComm.Controls.Add(this.numericUpDown1);
             this.geBoxComm.Controls.Add(this.numResponseTimeout);
             this.geBoxComm.Controls.Add(this.label2);
-            this.geBoxComm.Location = new System.Drawing.Point(323, 249);
+            this.geBoxComm.Location = new System.Drawing.Point(323, 304);
             this.geBoxComm.Name = "geBoxComm";
             this.geBoxComm.Size = new System.Drawing.Size(223, 132);
             this.geBoxComm.TabIndex = 13;
@@ -395,7 +401,7 @@
             this.groupBox1.Controls.Add(this.tbSerial);
             this.groupBox1.Controls.Add(this.numT);
             this.groupBox1.Controls.Add(this.numP);
-            this.groupBox1.Location = new System.Drawing.Point(552, 249);
+            this.groupBox1.Location = new System.Drawing.Point(552, 304);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(120, 132);
             this.groupBox1.TabIndex = 14;
@@ -481,11 +487,44 @@
             0,
             0});
             // 
+            // dgv1
+            // 
+            this.dgv1.AllowUserToAddRows = false;
+            this.dgv1.AllowUserToDeleteRows = false;
+            this.dgv1.AllowUserToOrderColumns = true;
+            this.dgv1.AllowUserToResizeColumns = false;
+            this.dgv1.AllowUserToResizeRows = false;
+            this.dgv1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgv1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.dgv1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgv1.ColumnHeadersVisible = false;
+            this.dgv1.Location = new System.Drawing.Point(12, 114);
+            this.dgv1.Name = "dgv1";
+            this.dgv1.ReadOnly = true;
+            this.dgv1.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.dgv1.RowHeadersVisible = false;
+            this.dgv1.Size = new System.Drawing.Size(660, 184);
+            this.dgv1.TabIndex = 15;
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(258, 6);
+            // 
+            // tsExportBtn
+            // 
+            this.tsExportBtn.Name = "tsExportBtn";
+            this.tsExportBtn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
+            this.tsExportBtn.Size = new System.Drawing.Size(261, 22);
+            this.tsExportBtn.Text = "Экспорт *.xls";
+            this.tsExportBtn.Click += new System.EventHandler(this.tsExportBtn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(684, 412);
+            this.ClientSize = new System.Drawing.Size(684, 464);
+            this.Controls.Add(this.dgv1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.geBoxComm);
             this.Controls.Add(this.grBoxBat);
@@ -515,6 +554,7 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numT)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numP)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -558,6 +598,9 @@
         private System.Windows.Forms.NumericUpDown numT;
         private System.Windows.Forms.NumericUpDown numP;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.DataGridView dgv1;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem tsExportBtn;
     }
 }
 
