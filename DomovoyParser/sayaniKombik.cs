@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Diagnostics;
 using System.Globalization;
+using System.Xml.Serialization;
 
 namespace Prizmer.Meters
 {
@@ -42,6 +43,12 @@ namespace Prizmer.Meters
     {
         public string serialNumber;
     };
+
+    [Serializable]
+    public struct DumpMeta
+    {
+        public List<int> ReadParamIdsList;
+    }
 
     public class sayani_kombik : CMeter, IMeter
     {
@@ -76,6 +83,10 @@ namespace Prizmer.Meters
         const string DIR_NAME_DUMPS = "Dumps";
         const string DIR_NAME_BATCH = "Batches";
         string directoryBase = "";
+
+        // передаем в конструктор тип класса
+        XmlSerializer formatter = new XmlSerializer(typeof(DumpMeta));
+        DumpMeta _dumpMeta = new DumpMeta();
 
 
 
@@ -451,6 +462,16 @@ namespace Prizmer.Meters
         }
 
 
+        public void ReplaceExtensionInFileName(string fullFileName, string newExtenstion, ref string newFullFileName)
+        {
+            //разберемся с файлом лога
+            string logDir = Path.GetDirectoryName(fullFileName);
+            string logFName = Path.GetFileNameWithoutExtension(fullFileName);
+            string logFullFileName = logDir + "\\" + logFName + newExtenstion;
+
+            newFullFileName = logFullFileName;
+        }
+
         public bool DeleteDumpFileAndLogs(string dumpFileName)
         {
             try
@@ -458,9 +479,11 @@ namespace Prizmer.Meters
                 File.Delete(dumpFileName);
 
                 //разберемся с файлом лога
-                string logDir = Path.GetDirectoryName(dumpFileName);
-                string logFName = Path.GetFileNameWithoutExtension(dumpFileName);
-                string logFullFileName = logDir + "\\" + logFName + ".log";
+                string logFullFileName = "";
+                ReplaceExtensionInFileName(dumpFileName, "*.log", ref logFullFileName);
+
+                //уберем метаданные
+                DeleteDumpMeta(dumpFileName);
 
                 if (File.Exists(logFullFileName))
                     File.Delete(logFullFileName);
@@ -472,6 +495,94 @@ namespace Prizmer.Meters
 
             return true;
         }
+
+        #region Управление метаданными
+
+        public bool SetDumpMeta(string dumpFileName, DumpMeta dumpMeta)
+        {
+            string metaFileName = "";
+            ReplaceExtensionInFileName(dumpFileName, "*.xls", ref metaFileName);
+
+            try
+            {
+                FileStream metaFileStream = new FileStream(metaFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                formatter.Serialize(metaFileStream, dumpMeta);
+                metaFileStream.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        public bool GetDumpMeta(string dumpFileName, ref DumpMeta dumpMeta)
+        {
+            string metaFileName = "";
+            ReplaceExtensionInFileName(dumpFileName, "*.xls", ref metaFileName);
+
+            try
+            {
+                FileStream metaFileStream = new FileStream(metaFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                dumpMeta = (DumpMeta)formatter.Deserialize(metaFileStream);
+                metaFileStream.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        public bool DeleteDumpMeta(string dumpFileName)
+        {
+            try
+            {
+                File.Delete(dumpFileName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public bool DumpMetaParamExists(string dumpFileName, int param)
+        {
+            DumpMeta dm = new DumpMeta();
+            if (GetDumpMeta(dumpFileName, ref dm))
+            {
+                List<int> readParamIdsList = dm.ReadParamIdsList;
+                return readParamIdsList.Exists((x) => { return x == param; });               
+            }
+
+            return false;
+        }
+        public bool DumpMetaAppendParam(string dumpFileName, int param)
+        {
+            DumpMeta dm = new DumpMeta();
+            if (GetDumpMeta(dumpFileName, ref dm))
+            {
+                if (dm.ReadParamIdsList.Exists((x) => { return x == param; }))
+                {
+                    return true;
+                }
+                else
+                {
+                    dm.ReadParamIdsList.Add(param);
+                    SetDumpMeta(dumpFileName, dm);
+                }
+            }
+            else
+            {
+                dm.ReadParamIdsList = new List<int>();
+                dm.ReadParamIdsList.Add(param);
+                SetDumpMeta(dumpFileName, dm);
+                return true;
+            }
+
+            return false;
+        }
+
+        #endregion
 
         #region Методы интерфейса
 
@@ -526,6 +637,7 @@ namespace Prizmer.Meters
         public bool ReadDailyValues(DateTime dt, ushort param, ushort tarif, ref float recordValue)
         {
             recordValue = -1;
+            bool DELETE_DUMPS_AFTER_PARSING = false;
 
             MeterInfo tmpMi = new MeterInfo();
             Params tmpPrms = new Params();
@@ -548,12 +660,28 @@ namespace Prizmer.Meters
                     DateTime dateCur = DateTime.Now.Date;
                     TimeSpan ts = dateCur - latestDumpDate;
 
-                    if (ts.TotalDays < readDailyTimeoutInDays)
+                    //если прошло <= N дней и искомый параметр уже считан, однозначно выходим
+                    if ((ts.TotalDays < readDailyTimeoutInDays) &&
+                        (DumpMetaParamExists(latestDumpFileName, param)))
                     {
                         return false;
                     }
+                    //если прошло менее N дней, но искомого параметра еще нет
+                    else if (!DumpMetaParamExists(latestDumpFileName, param))
+                    {
+                        //прочитаем недостающий параметр из уже существующего дампа
+                        //чтобы не дергать счетчик
+                        if (ParseDumpFile(latestDumpFileName, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
+                            if (GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
+                            {
+                                DumpMetaAppendParam(latestDumpFileName, param);
+                                return true;
+                            }                  
+                    }
+                    //если прошло более N дней
                     else
                     {
+                        //удалим дамп, логи и метаданные
                         DeleteDumpFileAndLogs(latestDumpFileName);
                     }
                 }
@@ -581,12 +709,13 @@ namespace Prizmer.Meters
             if (!ExecuteBatchConnection(batchConnList[0]))
                 return false;
 
-            bool DELETE_DUMPS_AFTER_PARSING = false;
             if (!ParseDumpFile(batchConnList[0].FileNameDump, ref tmpMi, ref tmpPrms, DELETE_DUMPS_AFTER_PARSING))
                 return false;
 
             if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
                 return false;
+
+            DumpMetaAppendParam(latestDumpFileName, param);
 
             return true;
         }
