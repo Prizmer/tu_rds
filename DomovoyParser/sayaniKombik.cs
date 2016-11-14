@@ -642,6 +642,8 @@ namespace Prizmer.Meters
             if (!GetParamValueFromParams(tmpPrms, param, tarif, out recordValue))
                 return false;
 
+            DeleteDumpFileAndLogs(batchConnList[0].FileNameDump);
+
             return true;
         }
 
