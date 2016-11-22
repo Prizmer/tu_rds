@@ -108,36 +108,36 @@ namespace DomovoyParser
 
             column = dt.Columns.Add();
             column.DataType = typeof(string);
-            column.Caption = "Q1 (МДж)";
+            column.Caption = "Q1 (ГДж)";
             column.ColumnName = "colEnergy1";
             paramCodes.Add(1);
             column = dt.Columns.Add();
             column.DataType = typeof(string);
-            column.Caption = "Q2 (МДж)";
+            column.Caption = "Q2 (ГДж)";
             column.ColumnName = "colEnergy2";
             paramCodes.Add(2);
 
             column = dt.Columns.Add();
             column.DataType = typeof(string);
-            column.Caption = "M1 (кг)";
+            column.Caption = "M1 (Т)";
             column.ColumnName = "colMass1";
             paramCodes.Add(3);
 
             column = dt.Columns.Add();
             column.DataType = typeof(string);
-            column.Caption = "M2 (кг)";
+            column.Caption = "M2 (Т)";
             column.ColumnName = "colMass2";
             paramCodes.Add(4);
 
             column = dt.Columns.Add();
             column.DataType = typeof(string);
-            column.Caption = "M3 (кг)";
+            column.Caption = "M3 (Т)";
             column.ColumnName = "colMass3";
             paramCodes.Add(5);
 
             column = dt.Columns.Add();
             column.DataType = typeof(string);
-            column.Caption = "M4 (кг)";
+            column.Caption = "M4 (Т)";
             column.ColumnName = "colMass4";
             paramCodes.Add(6);
 
