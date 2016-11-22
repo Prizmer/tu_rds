@@ -52,6 +52,12 @@ namespace DomovoyParser
             BatchConnection.FolderNameDump = "Dumps";
             BatchConnection.FolderNameLog = BatchConnection.FolderNameDump;
 
+            bool DELETE_DUMPS_FOLDER_AT_START = true;
+            if (DELETE_DUMPS_FOLDER_AT_START)
+            {
+                sayani_kombik.DeleteDumpDirectory();
+            }
+
             if (openedFilename.Length > 0)
             {
                 if (loadDumpFile(openedFilename))
@@ -325,7 +331,7 @@ namespace DomovoyParser
                 richTextBox1.Text += String.Format("***[ S/N: {0} ]***\n", tmpMeterInfo.serialNumber);
 
                 string strRepresentation = "";
-                if (!sayaniKombik.GetParamValues(fStreamDump, bytesFromTheEnd, ref prms, ref strRepresentation))
+                if (!sayaniKombik.FillParamsStructure(fStreamDump, out prms, out strRepresentation)) 
                     richTextBox1.Text += "Ошибка разбора дампа\n";
 
                 richTextBox1.Text += strRepresentation;
