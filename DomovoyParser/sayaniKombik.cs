@@ -412,6 +412,8 @@ namespace Prizmer.Meters
         {
             batchConnectionList = new List<BatchConnection>();
 
+            bool baseReplaceRes  = BaseReplace();
+
 
             for (int i = 0; i < fileInfoList.Count; i++)
             {
@@ -653,6 +655,24 @@ namespace Prizmer.Meters
             {
                 return false;
             }
+        }
+
+        public bool BaseReplace()
+        {
+            try
+            {
+                string newBasePath = directoryBase + "RDS\\Backup\\4rmd.gdb";
+                string oldBasePath = directoryBase + "RDS\\4rmd.gdb";
+                File.Delete(oldBasePath);
+                File.Copy(newBasePath, oldBasePath);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
         }
 
         public bool DeleteDumpFileAndLogs(string dumpFileName)
