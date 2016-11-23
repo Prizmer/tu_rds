@@ -64,8 +64,8 @@ namespace Prizmer.Meters
             psiOpt.RedirectStandardOutput = true;
             psiOpt.RedirectStandardInput = true;
             psiOpt.RedirectStandardError = true;
-           psiOpt.UseShellExecute = false;
-           psiOpt.CreateNoWindow = true;
+            psiOpt.UseShellExecute = false;
+            psiOpt.CreateNoWindow = true;
           }
 
         ~sayani_kombik()
@@ -88,7 +88,7 @@ namespace Prizmer.Meters
         }
 
         int readDailyTimeoutInDays = 3;
-        bool StopFlag = false;
+ 
 
         //время ожидания завершения работы утиллиты rds
         const int waitRDSTimeInSec = 60;
@@ -166,6 +166,8 @@ namespace Prizmer.Meters
         public event EventHandler<EventArgs> BatchFileExecutionStartEvent;
         public event EventHandler<EventArgs> BatchFileExecutionEndEvent;
         public event EventHandler<EventArgs> BatchFileTickEvent;
+
+        private bool StopFlag = false;
 
         #region Низкоуровневый разбор дампа
 
@@ -487,6 +489,10 @@ namespace Prizmer.Meters
             }
         }
 
+        public void SetStopFlag()
+        {
+            StopFlag = true;
+        }
 
 
         string tmpLogString = "";
@@ -560,7 +566,7 @@ namespace Prizmer.Meters
         {
             if (msg.Length > 0)
             {
-                FileStream fs = new FileStream(logFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+                FileStream fs = new FileStream(logFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
                 StreamWriter sw = new StreamWriter(fs);
                 sw.Write(msg + Environment.NewLine);
                 sw.Flush();

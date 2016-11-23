@@ -894,6 +894,7 @@ namespace DomovoyParser
             if (ExecutingThread != null && ExecutingThread.IsAlive)
             {
                 StopFlag = true;
+                sayaniKombik.SetStopFlag();
                 richTextBox1.Text += "\nОпрос остановится через несколько секунд\n";
             }
         }
