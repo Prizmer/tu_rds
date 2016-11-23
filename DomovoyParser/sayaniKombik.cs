@@ -66,6 +66,8 @@ namespace Prizmer.Meters
             psiOpt.RedirectStandardError = true;
             psiOpt.UseShellExecute = false;
             psiOpt.CreateNoWindow = true;
+
+            bool baseReplaceRes = BaseReplace();
           }
 
         ~sayani_kombik()
