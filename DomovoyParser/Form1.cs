@@ -41,7 +41,7 @@ namespace DomovoyParser
             sfd1.Filter = "Таблица Excel (*.xls) | *.xls";
             sfd1.FileName = "САЯНЫ показания";
 
-            numResponseTimeout.Value = 60;
+            numResponseTimeout.Value = 40;
 
             BatchConnectionList = new List<BatchConnection>();
 
@@ -937,11 +937,19 @@ namespace DomovoyParser
 
             sayaniKombik.Init(uint.Parse(tbSerial.Text), tbPass.Text, sayaniKombikVirtualPort);
 
+            string r1 = "прибор не ответил";
+            string r2 = "чтение с данного прибора заблокировано на некоторое время (~ 1 минута)";
+            string r3 = "с момента последнего опроса не прошло " + tbPass.Text + " дней";
+
+
+            string faultResultString = String.Format("Не удалось получить суточное значение, возможные причины:\n - {0};\n - {1};\n - {2};",
+                r1, r2, r3);
+            
             float val = -1;
             if (sayaniKombik.ReadDailyValues(DateTime.Now.Date, (ushort)numP.Value, (ushort)numT.Value, ref val))
-                richTextBox1.Text = "Получено новое значение: " + val.ToString();
+                richTextBox1.Text = "Получено суточное значение: " + val.ToString();
             else
-                richTextBox1.Text = "Не удалось получить новое значение, возможно с момента последнего опроса не прошло " + tbPass.Text + " дней";
+                richTextBox1.Text = faultResultString;
             
             ExecutionEnded_EventHandler(this, new EventArgs());
         }

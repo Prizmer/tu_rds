@@ -90,7 +90,9 @@ namespace Prizmer.Meters
         }
 
         int readDailyTimeoutInDays = 3;
- 
+
+        //если прибор не ответил один раз, он блокируется на это время
+        int blockingTimeMinutes = 1;
 
         //время ожидания завершения работы утиллиты rds
         const int waitRDSTimeInSec = 60;
@@ -659,7 +661,7 @@ namespace Prizmer.Meters
             return false;
         }
 
-        public bool LatestDumpFileName(string directoryPath, string serialNumberDec, out string fileName, out DateTime dt, 
+        public bool LatestByDateFileName(string directoryPath, string serialNumberDec, out string fileName, out DateTime dt, 
             string pattern = "*.dat")
         {
             fileName = "";
@@ -921,6 +923,75 @@ namespace Prizmer.Meters
             return true;
         }
 
+
+        /// <summary>
+        /// Определяет по коду завершения лога, было ли предыдущее чтение успешным (0). Если нет, то возвращает истину и прибор чтение
+        /// игнорируется на время blockingTimeMinutes. Это нужно для того, чтобы при отдельном опросе параметров, на 1 неотвечающий прибор не уходило
+        /// много времени. К примеру, чтобы проверить доступность прибора требуется 10 секунд. Если с него считывается 6 параметров по отдельности,
+        /// на его опрос уйдет минута. Используя блокировку, мы позволяем другим приборам занять это время.
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <param name="serialNumberDec"></param>
+        /// <param name="strTerminationCode"></param>
+        /// <returns></returns>
+        private bool IsReadingBlocked(int blockingTimeMinutes, string directoryPath, string serialNumberDec, 
+            ref string strTerminationCode)
+        {
+            string latestLogFileName = "";
+            DateTime latestLogDate = new DateTime();
+            strTerminationCode = "";
+
+            if (LatestByDateFileName(directoryPath, serialNumberDec, out latestLogFileName, out latestLogDate, "*.log"))
+            {
+                string logContentString = "";
+                FileInfo logFileInfo = new FileInfo(latestLogFileName);
+
+                try
+                {
+                    FileStream fs = new FileStream(latestLogFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    StreamReader sr = new StreamReader(fs);
+                    logContentString = sr.ReadToEnd();
+                    sr.Close();
+                }
+                catch (Exception ex)
+                {
+                    //при проблемах с открытием лога не стоит блокировать
+                    return false;
+                }
+
+
+                try
+                {
+                    Match m = Regex.Match(logContentString, "terminating with res = \\d*");
+                    string s = m.Groups[m.Groups.Count - 1].ToString();
+                    s = s.Replace("terminating with res = ", "");
+                    strTerminationCode = s;
+
+                    //если в прошлый раз все было хорошо, не станем блокировать
+                    if (s == "0") return false;
+
+                    latestLogDate = logFileInfo.LastWriteTime;
+                    TimeSpan ts = DateTime.Now - latestLogDate;
+                    //если в последний раз был код отличный от нуля и прошло меньше времени, чем время блокировки, заблокируем
+                    if (ts.TotalMinutes < blockingTimeMinutes)
+                        return true;
+                    else
+                        return false;
+                }
+                catch (Exception ex)
+                {
+                    //при проблемах с разбором лога не стоит блокировать
+                    return false;
+                }
+            }
+            else
+            {
+                //лог не найден, не нужно блокировать
+                return false;
+            }
+
+        }
+
         public bool ReadDailyValues(DateTime dt, ushort param, ushort tarif, ref float recordValue)
         {
             recordValue = -1;
@@ -938,12 +1009,16 @@ namespace Prizmer.Meters
             if (!Directory.Exists(curDumpDir))
                 Directory.CreateDirectory(curDumpDir);
 
+            string LogTerminationCode = "";
+            if (IsReadingBlocked(blockingTimeMinutes, curDumpDir, m_address.ToString(), ref LogTerminationCode))
+                return false;
+
             string latestDumpFileName = "";
             DateTime latestDumpDate = new DateTime();
-            if (LatestDumpFileName(curDumpDir, m_address.ToString(), out latestDumpFileName, out latestDumpDate))
+            if (LatestByDateFileName(curDumpDir, m_address.ToString(), out latestDumpFileName, out latestDumpDate, "*.dat"))
             {
                 if (File.Exists(latestDumpFileName))
-                {
+                { 
                     DateTime dateCur = DateTime.Now.Date;
                     TimeSpan ts = dateCur - latestDumpDate;
 
