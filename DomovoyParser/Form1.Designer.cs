@@ -69,6 +69,7 @@
             this.numP = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dgv1 = new System.Windows.Forms.DataGridView();
+            this.lblProgressTime = new System.Windows.Forms.Label();
             this.grBoxDump.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -187,6 +188,7 @@
             // 
             // connPrmsTSMI
             // 
+            this.connPrmsTSMI.Enabled = false;
             this.connPrmsTSMI.Name = "connPrmsTSMI";
             this.connPrmsTSMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.B)));
             this.connPrmsTSMI.Size = new System.Drawing.Size(195, 22);
@@ -311,6 +313,7 @@
             // 
             // geBoxComm
             // 
+            this.geBoxComm.Controls.Add(this.lblProgressTime);
             this.geBoxComm.Controls.Add(this.stopBtn);
             this.geBoxComm.Controls.Add(this.timerProgressBar);
             this.geBoxComm.Controls.Add(this.label1);
@@ -337,7 +340,7 @@
             // 
             // timerProgressBar
             // 
-            this.timerProgressBar.Location = new System.Drawing.Point(9, 41);
+            this.timerProgressBar.Location = new System.Drawing.Point(6, 40);
             this.timerProgressBar.Name = "timerProgressBar";
             this.timerProgressBar.Size = new System.Drawing.Size(203, 18);
             this.timerProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -354,6 +357,7 @@
             // 
             // numericUpDown1
             // 
+            this.numericUpDown1.Enabled = false;
             this.numericUpDown1.Increment = new decimal(new int[] {
             16,
             0,
@@ -376,6 +380,7 @@
             // 
             // numResponseTimeout
             // 
+            this.numResponseTimeout.Enabled = false;
             this.numResponseTimeout.Location = new System.Drawing.Point(152, 14);
             this.numResponseTimeout.Maximum = new decimal(new int[] {
             180,
@@ -395,6 +400,7 @@
             0,
             0,
             0});
+            this.numResponseTimeout.Visible = false;
             this.numResponseTimeout.ValueChanged += new System.EventHandler(this.numResponseTimeout_ValueChanged);
             // 
             // label2
@@ -456,7 +462,7 @@
             this.tbSerial.Name = "tbSerial";
             this.tbSerial.Size = new System.Drawing.Size(100, 20);
             this.tbSerial.TabIndex = 16;
-            this.tbSerial.Text = "2460";
+            this.tbSerial.Text = "2260";
             this.toolTip1.SetToolTip(this.tbSerial, "Последние 4 цифры десятичного серийника");
             // 
             // numT
@@ -519,6 +525,16 @@
             this.dgv1.Size = new System.Drawing.Size(660, 184);
             this.dgv1.TabIndex = 15;
             // 
+            // lblProgressTime
+            // 
+            this.lblProgressTime.AutoSize = true;
+            this.lblProgressTime.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.lblProgressTime.Location = new System.Drawing.Point(141, 16);
+            this.lblProgressTime.Name = "lblProgressTime";
+            this.lblProgressTime.Size = new System.Drawing.Size(13, 13);
+            this.lblProgressTime.TabIndex = 18;
+            this.lblProgressTime.Text = "0";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -538,6 +554,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "ПИ - анализатор файлов дампа";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.grBoxDump.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
@@ -601,6 +618,7 @@
         private System.Windows.Forms.DataGridView dgv1;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem tsExportBtn;
+        private System.Windows.Forms.Label lblProgressTime;
     }
 }
 

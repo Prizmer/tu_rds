@@ -58,6 +58,10 @@ namespace DomovoyParser
                 sayani_kombik.DeleteDumpDirectory();
             }
 
+
+            sayaniKombik.BatchFileTickEvent += new EventHandler<EventArgs>(sayaniKombik_BatchFileTickEvent);
+
+
             if (openedFilename.Length > 0)
             {
                 if (loadDumpFile(openedFilename))
@@ -442,8 +446,8 @@ namespace DomovoyParser
 
         Thread ExecutingThread;
 
-        event EventHandler<EventArgs> BatchFileExecutionStartEvent;
-        event EventHandler<EventArgs> BatchFileExecutionEndEvent;
+        event EventHandler<EventArgs> ExecutionStartedEvent;
+        event EventHandler<EventArgs> ExecutionEndedEvent;
         event EventHandler<EventArgs> BatchFileTriedEvent;
 
 
@@ -451,12 +455,30 @@ namespace DomovoyParser
         {
             StopFlag = false;
 
-            BatchFileExecutionStartEvent = new EventHandler<EventArgs>(BatchFileExecutionStart_EventHandler);
+            ExecutionStartedEvent = new EventHandler<EventArgs>(ExecutionStarted_EventHandler);
             BatchFileTriedEvent = new EventHandler<EventArgs>(BatchFileTried_EventHandler);
-            BatchFileExecutionEndEvent = new EventHandler<EventArgs>(BatchFileExecutionEnd_EventHandler);
+            ExecutionEndedEvent = new EventHandler<EventArgs>(ExecutionEnded_EventHandler);
+
+
 
             ExecutingThread = new Thread(new ParameterizedThreadStart(ExecuteBatchConnectionList));
             ExecutingThread.Start(batchConnectionList);
+        }
+
+        void sayaniKombik_BatchFileTickEvent(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Invoke((MethodInvoker)delegate()
+                {
+                    ++timerProgressBar.Value;
+                    lblProgressTime.Text = timerProgressBar.Value.ToString();
+                });
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         //выполняется в отдельном потоке
@@ -467,13 +489,13 @@ namespace DomovoyParser
             if (batchConnectionList.Count == 0)
                 return;
 
-            BatchFileExecutionStartEvent.Invoke(null, new EventArgs());
+            ExecutionStartedEvent.Invoke(null, new EventArgs());
 
             for (int i = 0; i < batchConnectionList.Count; i++)
             {
                 if (StopFlag)
                 {
-                    BatchFileExecutionEnd_EventHandler(null, new EventArgs());
+                    ExecutionEnded_EventHandler(null, new EventArgs());
                     return;
                 } 
 
@@ -483,56 +505,19 @@ namespace DomovoyParser
                 if (!bConn.ExistsRDS)
                 {
                     PrintMsg(String.Format("{1}: файл 'rdslib.exe, необходимый для подключения, не найден. Дирректория поиска: {0}\n\n", bConn.FileNameRDSLib, bConn.SerialNumber));
-                    BatchFileExecutionEnd_EventHandler(null, new EventArgs());
+                    ExecutionEnded_EventHandler(null, new EventArgs());
                     return;
                 }
 
-                // создаем процесс cmd.exe с параметрами "ipconfig /all"
-                ProcessStartInfo psiOpt = new ProcessStartInfo(@"cmd.exe");
+                this.Invoke((MethodInvoker)delegate()
+                {
+                    timerProgressBar.Maximum = (int)numResponseTimeout.Value;
+                    timerProgressBar.Value = 0;
+                });
 
-                psiOpt.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                // скрываем окно запущенного процесса
-                psiOpt.WindowStyle = ProcessWindowStyle.Hidden;
-                psiOpt.RedirectStandardOutput = true;
-                psiOpt.RedirectStandardInput = true;
-                psiOpt.UseShellExecute = false;
-                psiOpt.CreateNoWindow = true;
-                // запускаем процесс
-                Process procCommand = Process.Start(psiOpt);
-                procCommand.StandardInput.WriteLine(tmpCmd);
+                bool fileExecutionResult = sayaniKombik.ExecuteBatchConnection(bConn);
 
-               this.Invoke((MethodInvoker)delegate()
-               {
-                   timerProgressBar.Maximum = (int)numResponseTimeout.Value;
-                   timerProgressBar.Value = 0;
-               });
-
-
-               bool tmpRes = false;
-               for (int t = 0; t < (int)numResponseTimeout.Value; t++)
-               {
-                   if (StopFlag)
-                   {
-                       BatchFileExecutionEnd_EventHandler(null, new EventArgs());
-                       return;
-                   }
-
-                   if (sayaniKombik.IsDatFileAvailable(batchConnectionList[i].FileNameDump))
-                   {
-                       tmpRes = true;
-                       break;
-                   }
-
-                   Thread.Sleep(1000);
-
-                   this.Invoke((MethodInvoker)delegate()
-                   {
-                       ++timerProgressBar.Value;
-                   });
-
-               }
-
-               if (tmpRes)
+               if (fileExecutionResult)
                {
                    if (loadDumpFile(bConn.FileNameDump, false))
                    {
@@ -550,26 +535,16 @@ namespace DomovoyParser
                }
                else
                {
-                   try
-                   {
-                       procCommand.CloseMainWindow();
-                   }
-                   catch (Exception ex)
-                   {
-
-                   }
-
                    PrintMsg(String.Format("{0}: не найден файл дампа {1}, ошибка чтения.\n\n", bConn.SerialNumberDec2Bytes, bConn.FileNameDump));
                }
-
 
                 BatchFileTriedEvent.Invoke(null, new EventArgs());
             }
 
-            BatchFileExecutionEndEvent.Invoke(null, new EventArgs());
+            ExecutionEndedEvent.Invoke(null, new EventArgs());
         }
 
-        public void BatchFileExecutionStart_EventHandler(object sender, EventArgs e)
+        public void ExecutionStarted_EventHandler(object sender, EventArgs e)
         {
             Delegate del = (MethodInvoker)delegate()
             {
@@ -593,12 +568,14 @@ namespace DomovoyParser
             {
                 ++toolStripProgressBar1.Value;
                 tsLblCurrentFile.Text = (fileCnt++).ToString();
+                lblProgressTime.Text = "0";
+
             };
 
             this.Invoke(del);
         }
 
-        public void BatchFileExecutionEnd_EventHandler(object sender, EventArgs e)
+        public void ExecutionEnded_EventHandler(object sender, EventArgs e)
         {
 
             Delegate del = (MethodInvoker)delegate()
@@ -613,6 +590,8 @@ namespace DomovoyParser
                 richTextBox1.Clear();
                 richTextBox1.Text += "*** ОПРОС ЗАВЕРШЕН ***\n\n";
                 richTextBox1.Text += buf;
+
+                lblProgressTime.Text = "0";
 
             };
 
@@ -940,6 +919,8 @@ namespace DomovoyParser
             float val = -1;
             if (sayaniKombik.ReadCurrentValues((ushort)numP.Value, (ushort)numT.Value, ref val))
                 richTextBox1.Text = "Получено значение: " + val.ToString();
+            else
+                richTextBox1.Text = "ReadCurrentValues вернул false";
         }
 
         private void btnReadDaily_Click(object sender, EventArgs e)
@@ -984,6 +965,11 @@ namespace DomovoyParser
         }
 
         #endregion
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            StopFlag = true;
+        }
     }
 
 }
