@@ -922,6 +922,8 @@ namespace DomovoyParser
                 richTextBox1.Text = "Получено значение: " + val.ToString();
             else
                 richTextBox1.Text = "ReadCurrentValues вернул false";
+
+            ExecutionEnded_EventHandler(this, new EventArgs());
         }
 
         private void btnReadDaily_Click(object sender, EventArgs e)
@@ -935,7 +937,8 @@ namespace DomovoyParser
                 richTextBox1.Text = "Получено новое значение: " + val.ToString();
             else
                 richTextBox1.Text = "Не удалось получить новое значение, возможно с момента последнего опроса не прошло " + tbPass.Text + " дней";
-
+            
+            ExecutionEnded_EventHandler(this, new EventArgs());
         }
 
         private void tsExportBtn_Click(object sender, EventArgs e)
