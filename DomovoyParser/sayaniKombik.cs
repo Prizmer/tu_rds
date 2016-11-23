@@ -167,6 +167,7 @@ namespace Prizmer.Meters
         public event EventHandler<EventArgs> BatchFileExecutionEndEvent;
         public event EventHandler<EventArgs> BatchFileTickEvent;
 
+        //останавливает цикл опроса принудительно
         private bool StopFlag = false;
 
         #region Низкоуровневый разбор дампа
@@ -274,6 +275,7 @@ namespace Prizmer.Meters
                 }
                 catch (Exception ex)
                 {
+                    fsDump.Close();
                     return false;
                 }
 
@@ -350,9 +352,11 @@ namespace Prizmer.Meters
                 }
                 catch (Exception ex)
                 {
+                    fsDump.Close();
                     return false;
                 }
 
+                fsDump.Close();
                 return true;
             }
 
@@ -500,6 +504,8 @@ namespace Prizmer.Meters
 
         public bool ExecuteBatchConnection(BatchConnection batchConn)
         {
+            StopFlag = false;
+
             WriteToRDSLog(batchConn.FileNameLog, "Начат процесс чтения");
 
             tmpLogString = "";

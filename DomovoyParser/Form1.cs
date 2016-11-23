@@ -419,7 +419,12 @@ namespace DomovoyParser
                 {
                     if (doDumpMode)
                     {
-                        PrintLastRecord((int)numericUpDown1.Value);
+                        Params mp = new Params();
+                        string paramsStringRepr = "";
+                        sayaniKombik.FillParamsStructure(fStreamDump, out mp, out paramsStringRepr);
+
+                        richTextBox1.Text = "*** [S/N: " + tmpMeterInfo.serialNumber + "] ***\n";
+                        richTextBox1.Text += paramsStringRepr;
                         InitDumpReaderMode(filename);
                         fStreamDump.Close();
                     }
