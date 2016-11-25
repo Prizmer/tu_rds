@@ -41,8 +41,6 @@ namespace DomovoyParser
             sfd1.Filter = "Таблица Excel (*.xls) | *.xls";
             sfd1.FileName = "САЯНЫ показания";
 
-            numResponseTimeout.Value = 40;
-
             BatchConnectionList = new List<BatchConnection>();
 
             this.Text = formCaptionStringBase;
@@ -52,7 +50,7 @@ namespace DomovoyParser
             BatchConnection.FolderNameDump = "Dumps";
             BatchConnection.FolderNameLog = BatchConnection.FolderNameDump;
 
-            bool DELETE_DUMPS_FOLDER_AT_START = true;
+            bool DELETE_DUMPS_FOLDER_AT_START = false;
             if (DELETE_DUMPS_FOLDER_AT_START)
             {
                 sayani_kombik.DeleteDumpDirectory();
@@ -63,10 +61,7 @@ namespace DomovoyParser
 
 
             if (openedFilename.Length > 0)
-            {
-                if (loadDumpFile(openedFilename))
-                    PrintLastRecord((int)numericUpDown1.Value);
-            }
+                loadDumpFile(openedFilename);
         }
 
         const string DIR_NAME_LIB = "RDS";
@@ -516,7 +511,7 @@ namespace DomovoyParser
 
                 this.Invoke((MethodInvoker)delegate()
                 {
-                    timerProgressBar.Maximum = (int)numResponseTimeout.Value;
+                    timerProgressBar.Maximum = 60;
                     timerProgressBar.Value = 0;
                 });
 
@@ -558,7 +553,7 @@ namespace DomovoyParser
 
                 this.Text = formCaptionStringBase + formCaptionMultiBatchMode + formCaptionBatExecution;
                 grBoxBat.Enabled = false;
-                grBoxDump.Enabled = false;
+
                 stopBtn.Enabled = true;
                 fileCnt = 1;
             };
@@ -656,7 +651,7 @@ namespace DomovoyParser
             toolStripProgressBar1.Value = 0;
 
             timerProgressBar.Value = 0;
-            timerProgressBar.Maximum = (int)numResponseTimeout.Value;
+            timerProgressBar.Maximum = 60;
 
             stopBtn.Enabled = false;
         }
@@ -692,11 +687,10 @@ namespace DomovoyParser
                     numBatchFileNum.Value = numBatchFileNum.Minimum;
 
                     grBoxBat.Enabled = false;
-                    grBoxDump.Enabled = true;
                 }
                 else
                 {
-                    grBoxDump.Enabled = false; ;
+
                 }
             }
         }
@@ -748,7 +742,6 @@ namespace DomovoyParser
             numBatchFileNum.Maximum = BatchConnectionList.Count;
 
             grBoxBat.Enabled = true;
-            grBoxDump.Enabled = false;
 
             DialogResult dlgr = MessageBox.Show(String.Format("Открыто ({0}) .bat файла, выполнить сразу?", BatchConnectionList.Count), "Выполнение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dlgr == System.Windows.Forms.DialogResult.Yes)
@@ -781,10 +774,7 @@ namespace DomovoyParser
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            PrintLastRecord((int)numericUpDown1.Value);
-        }
+
 
         private void richTextBox1_DoubleClick(object sender, EventArgs e)
         {
@@ -793,7 +783,7 @@ namespace DomovoyParser
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            PrintLastRecord((int)numericUpDown1.Value);
+            
         }
 
         private void btnListOpenedFiles_Click(object sender, EventArgs e)
@@ -986,6 +976,10 @@ namespace DomovoyParser
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             StopFlag = true;
+
+            DialogResult dg = MessageBox.Show("Очистить дирректорию с дампами?", "Подождите", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dg == System.Windows.Forms.DialogResult.Yes)
+                sayani_kombik.DeleteDumpDirectory();
         }
     }
 

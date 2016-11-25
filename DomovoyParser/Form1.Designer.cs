@@ -31,8 +31,6 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.grBoxDump = new System.Windows.Forms.GroupBox();
-            this.button2 = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,11 +52,11 @@
             this.btnExecFile = new System.Windows.Forms.Button();
             this.btnListOpenedFiles = new System.Windows.Forms.Button();
             this.geBoxComm = new System.Windows.Forms.GroupBox();
+            this.lblProgressTime = new System.Windows.Forms.Label();
             this.stopBtn = new System.Windows.Forms.Button();
             this.timerProgressBar = new System.Windows.Forms.ProgressBar();
             this.label1 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.numResponseTimeout = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btnReadDaily = new System.Windows.Forms.Button();
@@ -69,15 +67,12 @@
             this.numP = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.dgv1 = new System.Windows.Forms.DataGridView();
-            this.lblProgressTime = new System.Windows.Forms.Label();
-            this.grBoxDump.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.grBoxBat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numBatchFileNum)).BeginInit();
             this.geBoxComm.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numResponseTimeout)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numT)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numP)).BeginInit();
@@ -97,27 +92,6 @@
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             this.richTextBox1.DoubleClick += new System.EventHandler(this.richTextBox1_DoubleClick);
-            // 
-            // grBoxDump
-            // 
-            this.grBoxDump.Controls.Add(this.button2);
-            this.grBoxDump.Location = new System.Drawing.Point(206, 304);
-            this.grBoxDump.Name = "grBoxDump";
-            this.grBoxDump.Size = new System.Drawing.Size(111, 132);
-            this.grBoxDump.TabIndex = 6;
-            this.grBoxDump.TabStop = false;
-            this.grBoxDump.Text = "Работа с дампом";
-            // 
-            // button2
-            // 
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Location = new System.Drawing.Point(6, 19);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(78, 23);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "Последняя";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // openFileDialog1
             // 
@@ -318,14 +292,23 @@
             this.geBoxComm.Controls.Add(this.timerProgressBar);
             this.geBoxComm.Controls.Add(this.label1);
             this.geBoxComm.Controls.Add(this.numericUpDown1);
-            this.geBoxComm.Controls.Add(this.numResponseTimeout);
             this.geBoxComm.Controls.Add(this.label2);
-            this.geBoxComm.Location = new System.Drawing.Point(323, 304);
+            this.geBoxComm.Location = new System.Drawing.Point(206, 304);
             this.geBoxComm.Name = "geBoxComm";
             this.geBoxComm.Size = new System.Drawing.Size(223, 132);
             this.geBoxComm.TabIndex = 13;
             this.geBoxComm.TabStop = false;
             this.geBoxComm.Text = "Общее";
+            // 
+            // lblProgressTime
+            // 
+            this.lblProgressTime.AutoSize = true;
+            this.lblProgressTime.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.lblProgressTime.Location = new System.Drawing.Point(144, 16);
+            this.lblProgressTime.Name = "lblProgressTime";
+            this.lblProgressTime.Size = new System.Drawing.Size(13, 13);
+            this.lblProgressTime.TabIndex = 18;
+            this.lblProgressTime.Text = "0";
             // 
             // stopBtn
             // 
@@ -378,31 +361,6 @@
             0,
             0});
             // 
-            // numResponseTimeout
-            // 
-            this.numResponseTimeout.Enabled = false;
-            this.numResponseTimeout.Location = new System.Drawing.Point(152, 14);
-            this.numResponseTimeout.Maximum = new decimal(new int[] {
-            180,
-            0,
-            0,
-            0});
-            this.numResponseTimeout.Minimum = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            this.numResponseTimeout.Name = "numResponseTimeout";
-            this.numResponseTimeout.Size = new System.Drawing.Size(60, 20);
-            this.numResponseTimeout.TabIndex = 13;
-            this.numResponseTimeout.Value = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            this.numResponseTimeout.Visible = false;
-            this.numResponseTimeout.ValueChanged += new System.EventHandler(this.numResponseTimeout_ValueChanged);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -420,30 +378,32 @@
             this.groupBox1.Controls.Add(this.tbSerial);
             this.groupBox1.Controls.Add(this.numT);
             this.groupBox1.Controls.Add(this.numP);
-            this.groupBox1.Location = new System.Drawing.Point(552, 304);
+            this.groupBox1.Location = new System.Drawing.Point(435, 304);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(120, 132);
+            this.groupBox1.Size = new System.Drawing.Size(237, 132);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ф-ии СО";
             // 
             // btnReadDaily
             // 
-            this.btnReadDaily.Location = new System.Drawing.Point(60, 95);
+            this.btnReadDaily.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReadDaily.Location = new System.Drawing.Point(140, 64);
             this.btnReadDaily.Name = "btnReadDaily";
-            this.btnReadDaily.Size = new System.Drawing.Size(46, 23);
+            this.btnReadDaily.Size = new System.Drawing.Size(91, 23);
             this.btnReadDaily.TabIndex = 19;
-            this.btnReadDaily.Text = "Сут";
+            this.btnReadDaily.Text = "Суточные";
             this.btnReadDaily.UseVisualStyleBackColor = true;
             this.btnReadDaily.Click += new System.EventHandler(this.btnReadDaily_Click);
             // 
             // btnReadCurrent
             // 
-            this.btnReadCurrent.Location = new System.Drawing.Point(6, 95);
+            this.btnReadCurrent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReadCurrent.Location = new System.Drawing.Point(140, 19);
             this.btnReadCurrent.Name = "btnReadCurrent";
-            this.btnReadCurrent.Size = new System.Drawing.Size(51, 23);
+            this.btnReadCurrent.Size = new System.Drawing.Size(91, 23);
             this.btnReadCurrent.TabIndex = 18;
-            this.btnReadCurrent.Text = "Тек";
+            this.btnReadCurrent.Text = "Текущие";
             this.btnReadCurrent.UseVisualStyleBackColor = true;
             this.btnReadCurrent.Click += new System.EventHandler(this.btnReadCurrent_Click);
             // 
@@ -525,16 +485,6 @@
             this.dgv1.Size = new System.Drawing.Size(660, 184);
             this.dgv1.TabIndex = 15;
             // 
-            // lblProgressTime
-            // 
-            this.lblProgressTime.AutoSize = true;
-            this.lblProgressTime.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lblProgressTime.Location = new System.Drawing.Point(141, 16);
-            this.lblProgressTime.Name = "lblProgressTime";
-            this.lblProgressTime.Size = new System.Drawing.Size(13, 13);
-            this.lblProgressTime.TabIndex = 18;
-            this.lblProgressTime.Text = "0";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -545,7 +495,6 @@
             this.Controls.Add(this.geBoxComm);
             this.Controls.Add(this.grBoxBat);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.grBoxDump);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -556,7 +505,6 @@
             this.Text = "ПИ - анализатор файлов дампа";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
-            this.grBoxDump.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -566,7 +514,6 @@
             this.geBoxComm.ResumeLayout(false);
             this.geBoxComm.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numResponseTimeout)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numT)).EndInit();
@@ -580,8 +527,6 @@
         #endregion
 
         private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.Windows.Forms.GroupBox grBoxDump;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem файлToolStripMenuItem;
@@ -599,7 +544,6 @@
         private System.Windows.Forms.Button btnExecFile;
         private System.Windows.Forms.Button btnListOpenedFiles;
         private System.Windows.Forms.GroupBox geBoxComm;
-        private System.Windows.Forms.NumericUpDown numResponseTimeout;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnShowFile;
         private System.Windows.Forms.Label label1;
