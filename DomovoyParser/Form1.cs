@@ -410,13 +410,24 @@ namespace DomovoyParser
             {
                 fStreamDump = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-                if (GetMeterInfo(fStreamDump, ref tmpMeterInfo))
+                if (sayaniKombik.GetMeterInfo(fStreamDump, ref tmpMeterInfo))
                 {
                     if (doDumpMode)
                     {
                         Params mp = new Params();
                         string paramsStringRepr = "";
-                        sayaniKombik.FillParamsStructure(fStreamDump, out mp, out paramsStringRepr);
+
+                        if (tmpMeterInfo.sayaniMeterTypeInt == (int)SayaniMeterTypes.RMDImpulse2Channel)
+                        {
+                            sayaniKombik.FillParamsStructureImpulse(fStreamDump, out mp, out paramsStringRepr);
+          
+                        }
+                        else
+                        {
+                            sayaniKombik.FillParamsStructure(fStreamDump, out mp, out paramsStringRepr);
+             
+                        }
+                       // sayaniKombik.FillParamsStructure(fStreamDump, out mp, out paramsStringRepr);
 
                         richTextBox1.Text = "*** [S/N: " + tmpMeterInfo.serialNumber + "] ***\n";
                         richTextBox1.Text += paramsStringRepr;
