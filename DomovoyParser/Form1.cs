@@ -533,11 +533,18 @@ namespace DomovoyParser
                    if (loadDumpFile(bConn.FileNameDump, false))
                    {
                        if (tmpMeterInfo.sayaniMeterTypeInt != (int)SayaniMeterTypes.RMDImpulse2Channel)
+                       {
                            this.Invoke((MethodInvoker)delegate()
                            {
                                PrintLastRecord((int)numericUpDown1.Value, false, dt, i + 1);
                                PrintMsg("\n");
                            });
+                       }
+                       else
+                       {
+
+                           loadDumpFile(bConn.FileNameDump, true);
+                       }
                    }
 
                    if (fStreamDump != null)
