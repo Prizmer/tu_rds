@@ -532,11 +532,12 @@ namespace DomovoyParser
                {
                    if (loadDumpFile(bConn.FileNameDump, false))
                    {
-                       this.Invoke((MethodInvoker)delegate()
-                       {
-                           PrintLastRecord((int)numericUpDown1.Value, false, dt, i + 1);
-                           PrintMsg("\n");
-                       });
+                       if (tmpMeterInfo.sayaniMeterTypeInt != (int)SayaniMeterTypes.RMDImpulse2Channel)
+                           this.Invoke((MethodInvoker)delegate()
+                           {
+                               PrintLastRecord((int)numericUpDown1.Value, false, dt, i + 1);
+                               PrintMsg("\n");
+                           });
                    }
 
                    if (fStreamDump != null)
