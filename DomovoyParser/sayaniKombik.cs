@@ -455,6 +455,9 @@ namespace Prizmer.Meters
 
                 sourceBytes = new byte[tmpIntBuffer.Length];
                 Array.Copy(tmpIntBuffer, sourceBytes, tmpIntBuffer.Length);
+
+                //if (BitConverter.IsLittleEndian)
+                //    Array.Reverse(tmpIntBuffer);
   
                 int val = -2;
                 if (valBytesCount == 1)
@@ -469,6 +472,35 @@ namespace Prizmer.Meters
             catch (Exception ex)
             {
                 return -2;
+            }
+        }
+
+        public bool IsDumpCorrect(FileStream fs)
+        {
+            /* проверяем заголовок дампа (служебная информация). Если модель и серийный номер - нули
+             * получен некорректный дамп */
+
+            int modelIdx = 0x0005;
+            int serialIdx = 0x000B;
+
+            try
+            {
+                fs.Seek(modelIdx, SeekOrigin.Begin);
+                int modelValue = (int)fs.ReadByte();
+
+                fs.Seek(serialIdx, SeekOrigin.Begin);
+                int serialValue = (int)fs.ReadByte();
+
+                // 0x30 - 0 в ASCII
+                if (modelValue == serialValue && modelValue == 0x30)
+                    return false;
+                else
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                WriteToLog("Исключение при попытке чтения модели и s/n из служебного заголовка дампа: " + ex.Message);
+                return false;
             }
         }
 
@@ -692,7 +724,7 @@ namespace Prizmer.Meters
                 FileStream dumpFileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 
                 bool tmpRes = false;
-                if (GetMeterInfo(dumpFileStream, ref mi))
+                if (IsDumpCorrect(dumpFileStream) && GetMeterInfo(dumpFileStream, ref mi))
                 {
                     if (mi.sayaniMeterTypeInt == (int)SayaniMeterTypes.RMDImpulse2Channel)
                     {

@@ -410,7 +410,7 @@ namespace DomovoyParser
             {
                 fStreamDump = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-                if (sayaniKombik.GetMeterInfo(fStreamDump, ref tmpMeterInfo))
+                if (sayaniKombik.IsDumpCorrect(fStreamDump) && sayaniKombik.GetMeterInfo(fStreamDump, ref tmpMeterInfo))
                 {
                     if (doDumpMode)
                     {
